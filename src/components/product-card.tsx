@@ -32,7 +32,7 @@ export default function ProductCard({
           rel="nofollow sponsored noopener noreferrer"
           className="gradient-button inline-block w-fit rounded-lg px-4 py-2 text-sm font-semibold text-white"
         >
-          Check Price
+          Buy Now
         </a>
       </div>
     </div>
