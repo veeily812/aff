@@ -146,15 +146,15 @@ export default function PostForm({ initialValues }: { initialValues?: PostFormVa
       </div>
 
       <div className="space-y-1">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <label htmlFor="body" className="text-sm font-medium text-white/70">
             Body (Markdown)
           </label>
-          <div className="flex items-center gap-2">
+          <div className="flex min-w-0 items-center gap-2">
             <select
               value={selectedProductId}
               onChange={(event) => setSelectedProductId(event.target.value)}
-              className="rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-xs text-white focus:border-purple-400/50 focus:outline-none"
+              className="w-40 shrink rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-xs text-white focus:border-purple-400/50 focus:outline-none"
             >
               <option value="" className="bg-slate-900">
                 Select product...
@@ -169,7 +169,7 @@ export default function PostForm({ initialValues }: { initialValues?: PostFormVa
               type="button"
               onClick={insertProductToken}
               disabled={!selectedProductId}
-              className="rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-xs text-white/80 transition-colors hover:text-white disabled:opacity-50"
+              className="shrink-0 rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-xs text-white/80 transition-colors hover:text-white disabled:opacity-50"
             >
               Insert Product
             </button>
