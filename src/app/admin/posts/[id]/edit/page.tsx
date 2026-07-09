@@ -16,7 +16,7 @@ export default async function EditPostPage({ params }: EditPostPageProps) {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold text-gray-900">Edit Post</h1>
+      <h1 className="gradient-text text-2xl font-bold">Edit Post</h1>
       <PostForm
         initialValues={{
           id: post.id,

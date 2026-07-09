@@ -9,6 +9,7 @@ interface ProductFormValues {
   name: string;
   description: string;
   price: string;
+  category?: string;
   affiliateUrl: string;
   imageUrl?: string;
 }
@@ -28,6 +29,7 @@ export default function ProductForm({ initialValues }: ProductFormProps) {
   const [name, setName] = useState(initialValues?.name ?? "");
   const [description, setDescription] = useState(initialValues?.description ?? "");
   const [price, setPrice] = useState(initialValues?.price ?? "");
+  const [category, setCategory] = useState(initialValues?.category ?? "");
   const [affiliateUrl, setAffiliateUrl] = useState(initialValues?.affiliateUrl ?? "");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -48,6 +50,7 @@ export default function ProductForm({ initialValues }: ProductFormProps) {
     formData.set("name", name);
     formData.set("description", description);
     formData.set("price", price);
+    formData.set("category", category);
     formData.set("affiliateUrl", affiliateUrl);
 
     if (imageFile) {
@@ -113,6 +116,19 @@ export default function ProductForm({ initialValues }: ProductFormProps) {
           value={price}
           onChange={(event) => setPrice(event.target.value)}
           placeholder="$19.99"
+          className={inputClass}
+        />
+      </div>
+
+      <div className="space-y-1">
+        <label htmlFor="category" className={labelClass}>
+          Category (optional)
+        </label>
+        <input
+          id="category"
+          value={category}
+          onChange={(event) => setCategory(event.target.value)}
+          placeholder="Clothing, Electronics, Home..."
           className={inputClass}
         />
       </div>

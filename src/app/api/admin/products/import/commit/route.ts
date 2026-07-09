@@ -23,6 +23,7 @@ export async function POST(request: Request) {
       name: row.name,
       description: row.description,
       price: row.price || null,
+      category: row.category || null,
       affiliateUrl: row.affiliateUrl,
       imageUrl: row.imageUrl,
     })),

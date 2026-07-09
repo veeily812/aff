@@ -19,6 +19,7 @@ export async function POST(request: Request) {
     name: formData.get("name"),
     description: formData.get("description"),
     price: formData.get("price"),
+    category: formData.get("category"),
     affiliateUrl: formData.get("affiliateUrl"),
   });
 
@@ -44,6 +45,7 @@ export async function POST(request: Request) {
         name: parsed.data.name,
         description: parsed.data.description,
         price: parsed.data.price || null,
+        category: parsed.data.category || null,
         affiliateUrl: parsed.data.affiliateUrl,
         imageUrl,
       },

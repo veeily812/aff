@@ -17,6 +17,7 @@ model Product {
   name          String
   description   String
   price         String?
+  category      String?
   imageUrl      String
   affiliateUrl  String
   createdAt     DateTime  @default(now())

@@ -153,8 +153,8 @@ export default function ImportProductsPage() {
 
         <p className="text-xs text-white/40">
           Expected columns: <code>name</code>, <code>description</code>, <code>price</code>{" "}
-          (optional), <code>affiliateUrl</code>, <code>imageUrl</code> (a direct link to an
-          image).{" "}
+          (optional), <code>category</code> (optional), <code>affiliateUrl</code>,{" "}
+          <code>imageUrl</code> (a direct link to an image).{" "}
           <a
             href="/templates/product-import-template.xlsx"
             download
@@ -198,6 +198,7 @@ export default function ImportProductsPage() {
                   <th className="px-3 py-2 text-left font-medium text-white/60">Row</th>
                   <th className="px-3 py-2 text-left font-medium text-white/60">Name</th>
                   <th className="px-3 py-2 text-left font-medium text-white/60">Price</th>
+                  <th className="px-3 py-2 text-left font-medium text-white/60">Category</th>
                   <th className="px-3 py-2 text-left font-medium text-white/60">Affiliate URL</th>
                   <th className="px-3 py-2 text-left font-medium text-white/60">Status</th>
                 </tr>
@@ -218,6 +219,7 @@ export default function ImportProductsPage() {
                       {row.data?.name ?? row.raw.name ?? "-"}
                     </td>
                     <td className="px-3 py-2 text-white/50">{row.data?.price || "-"}</td>
+                    <td className="px-3 py-2 text-white/50">{row.data?.category || "-"}</td>
                     <td className="max-w-xs truncate px-3 py-2 text-white/50">
                       {row.data?.affiliateUrl ?? "-"}
                     </td>

@@ -4,6 +4,7 @@ export const productSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(200),
   description: z.string().trim().min(1, "Description is required").max(2000),
   price: z.string().trim().max(50).optional().or(z.literal("")),
+  category: z.string().trim().max(100).optional().or(z.literal("")),
   affiliateUrl: z.string().trim().url("Must be a valid URL"),
 });
 
@@ -13,6 +14,7 @@ export const productImportRowSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(200),
   description: z.string().trim().min(1, "Description is required").max(2000),
   price: z.string().trim().max(50).optional().or(z.literal("")),
+  category: z.string().trim().max(100).optional().or(z.literal("")),
   affiliateUrl: z.string().trim().url("Affiliate URL must be a valid URL"),
   imageUrl: z.string().trim().url("Image URL must be a valid URL"),
 });

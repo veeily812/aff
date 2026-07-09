@@ -16,13 +16,14 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold text-gray-900">Edit Product</h1>
+      <h1 className="gradient-text text-2xl font-bold">Edit Product</h1>
       <ProductForm
         initialValues={{
           id: product.id,
           name: product.name,
           description: product.description,
           price: product.price ?? "",
+          category: product.category ?? "",
           affiliateUrl: product.affiliateUrl,
           imageUrl: product.imageUrl,
         }}
