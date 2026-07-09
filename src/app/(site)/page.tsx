@@ -5,7 +5,14 @@ import { extractProductIds } from "@/lib/post-content";
 
 export const dynamic = "force-dynamic";
 
-export default async function HomePage() {
+interface HomePageProps {
+  searchParams: Promise<{ q?: string }>;
+}
+
+export default async function HomePage({ searchParams }: HomePageProps) {
+  const { q } = await searchParams;
+  const query = q?.trim().toLowerCase() ?? "";
+
   const posts = await prisma.post.findMany({
     where: { published: true },
     orderBy: { createdAt: "desc" },
@@ -20,6 +27,19 @@ export default async function HomePage() {
     : [];
   const productsById = new Map(products.map((product) => [product.id, product]));
 
+  const visiblePosts = posts.filter((post) => {
+    if (!query) {
+      return true;
+    }
+
+    const productId = firstProductIdByPostId.get(post.id);
+    const product = productId ? productsById.get(productId) : undefined;
+
+    return [post.title, post.body, product?.name, product?.description]
+      .filter(Boolean)
+      .some((text) => text!.toLowerCase().includes(query));
+  });
+
   return (
     <div className="space-y-10">
       <div className="animate-fade-in-up">
@@ -27,11 +47,39 @@ export default async function HomePage() {
         <p className="mt-3 text-white/60">Hand-picked product recommendations and roundups.</p>
       </div>
 
-      {posts.length === 0 ? (
-        <p className="text-white/50">No posts published yet. Check back soon.</p>
+      <form action="/" method="GET" className="animate-fade-in-up flex gap-2">
+        <input
+          type="text"
+          name="q"
+          defaultValue={q ?? ""}
+          placeholder="Search products..."
+          className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-white placeholder-white/30 focus:border-purple-400/50 focus:outline-none focus:ring-2 focus:ring-purple-400/20"
+        />
+        <button
+          type="submit"
+          className="gradient-button shrink-0 rounded-lg px-5 py-2 text-sm font-semibold text-white"
+        >
+          Search
+        </button>
+        {query ? (
+          <Link
+            href="/"
+            className="glass-card shrink-0 rounded-lg px-4 py-2 text-sm text-white/70 transition-colors hover:text-white"
+          >
+            Clear
+          </Link>
+        ) : null}
+      </form>
+
+      {visiblePosts.length === 0 ? (
+        <p className="text-white/50">
+          {query
+            ? `No products found for "${q}".`
+            : "No posts published yet. Check back soon."}
+        </p>
       ) : (
         <ul className="space-y-6">
-          {posts.map((post, index) => {
+          {visiblePosts.map((post, index) => {
             const productId = firstProductIdByPostId.get(post.id);
             const product = productId ? productsById.get(productId) : undefined;
 
