@@ -154,7 +154,14 @@ export default function ImportProductsPage() {
         <p className="text-xs text-white/40">
           Expected columns: <code>name</code>, <code>description</code>, <code>price</code>{" "}
           (optional), <code>affiliateUrl</code>, <code>imageUrl</code> (a direct link to an
-          image).
+          image).{" "}
+          <a
+            href="/templates/product-import-template.xlsx"
+            download
+            className="text-purple-300 underline hover:text-purple-200"
+          >
+            Download sample template
+          </a>
         </p>
 
         {error ? <p className="text-sm text-red-400">{error}</p> : null}

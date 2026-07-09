@@ -33,6 +33,45 @@ function normalizeHeader(header: string): string {
   return header.toLowerCase().replace(/[^a-z0-9]/g, "");
 }
 
+/**
+ * exceljs cell values aren't always plain strings — hyperlinks, rich text, and formulas
+ * come back as objects. Naively stringifying those produces "[object Object]", so this
+ * extracts the actual displayable/usable text for each shape.
+ */
+function cellValueToString(value: unknown): string {
+  if (value == null) {
+    return "";
+  }
+
+  if (value instanceof Date) {
+    return value.toISOString();
+  }
+
+  if (typeof value === "object") {
+    if ("hyperlink" in value && typeof (value as { hyperlink?: unknown }).hyperlink === "string") {
+      return (value as { hyperlink: string }).hyperlink;
+    }
+
+    if ("text" in value && typeof (value as { text?: unknown }).text === "string") {
+      return (value as { text: string }).text;
+    }
+
+    if ("richText" in value && Array.isArray((value as { richText?: unknown }).richText)) {
+      return (value as { richText: { text: string }[] }).richText
+        .map((segment) => segment.text)
+        .join("");
+    }
+
+    if ("result" in value) {
+      return cellValueToString((value as { result: unknown }).result);
+    }
+
+    return "";
+  }
+
+  return String(value);
+}
+
 function rawRowsToResults(rawRows: Record<string, string>[]): ImportRowResult[] {
   return rawRows.map((raw, index) => {
     const mapped: Partial<Record<keyof ProductImportRow, string>> = {};
@@ -79,7 +118,7 @@ export async function parseXlsxBuffer(arrayBuffer: ArrayBuffer): Promise<ImportR
   const headerRow = worksheet.getRow(1);
   const headers: string[] = [];
   headerRow.eachCell({ includeEmpty: false }, (cell, colNumber) => {
-    headers[colNumber] = String(cell.value ?? "").trim();
+    headers[colNumber] = cellValueToString(cell.value).trim();
   });
 
   const rawRows: Record<string, string>[] = [];
@@ -93,7 +132,7 @@ export async function parseXlsxBuffer(arrayBuffer: ArrayBuffer): Promise<ImportR
     row.eachCell({ includeEmpty: false }, (cell, colNumber) => {
       const header = headers[colNumber];
       if (header) {
-        raw[header] = String(cell.value ?? "").trim();
+        raw[header] = cellValueToString(cell.value).trim();
       }
     });
 

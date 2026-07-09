@@ -1,10 +1,7 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import { prisma } from "@/lib/prisma";
-import { parsePostBody, extractProductIds } from "@/lib/post-content";
-import ProductCard from "@/components/product-card";
+import { extractProductIds } from "@/lib/post-content";
 
 export const dynamic = "force-dynamic";
 
@@ -46,50 +43,15 @@ export default async function PostPage({ params }: PostPageProps) {
     notFound();
   }
 
-  const blocks = parsePostBody(post.body);
-  const productIds = extractProductIds(post.body);
-  const products = productIds.length
-    ? await prisma.product.findMany({ where: { id: { in: productIds } } })
-    : [];
-  const productsById = new Map(products.map((product) => [product.id, product]));
+  const [firstProductId] = extractProductIds(post.body);
 
-  return (
-    <article className="prose prose-invert glass-card animate-fade-in-up max-w-none rounded-2xl p-6 sm:p-10">
-      <h1 className="gradient-text">{post.title}</h1>
-      <p className="text-sm text-white/40">
-        {new Date(post.createdAt).toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        })}
-      </p>
+  if (firstProductId) {
+    const product = await prisma.product.findUnique({ where: { id: firstProductId } });
 
-      {blocks.map((block, index) => {
-        if (block.type === "markdown") {
-          return (
-            <ReactMarkdown key={index} remarkPlugins={[remarkGfm]}>
-              {block.content}
-            </ReactMarkdown>
-          );
-        }
+    if (product) {
+      redirect(product.affiliateUrl);
+    }
+  }
 
-        const product = productsById.get(block.productId);
-
-        if (!product) {
-          return null;
-        }
-
-        return (
-          <ProductCard
-            key={index}
-            name={product.name}
-            description={product.description}
-            price={product.price}
-            imageUrl={product.imageUrl}
-            affiliateUrl={product.affiliateUrl}
-          />
-        );
-      })}
-    </article>
-  );
+  notFound();
 }

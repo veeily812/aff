@@ -45,3 +45,4 @@ next-env.d.ts
 
 # local Claude Code settings (personal, not shared)
 .claude/settings.local.json
+.claude/scheduled_tasks.lock
