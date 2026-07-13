@@ -34,7 +34,7 @@ model Organization {
 
 model Channel {
   id             String       @id @default(cuid())
-  name           String
+  name           String       @unique
   organizationId String?
   organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   createdAt      DateTime     @default(now())
@@ -76,7 +76,7 @@ model Product {
 model Post {
   id             String       @id @default(cuid())
   title          String
-  slug           String
+  slug           String       @unique
   coverImage     String?
   body           String
   published      Boolean      @default(false)
