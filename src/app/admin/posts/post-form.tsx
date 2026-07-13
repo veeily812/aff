@@ -9,11 +9,22 @@ interface PostFormValues {
   slug: string;
   body: string;
   published: boolean;
+  channelId?: string | null;
 }
 
 interface AdminProduct {
   id: string;
   name: string;
+}
+
+interface ChannelOption {
+  id: string;
+  name: string;
+}
+
+interface PostFormProps {
+  initialValues?: PostFormValues;
+  channels?: ChannelOption[];
 }
 
 function slugify(value: string): string {
@@ -24,7 +35,7 @@ function slugify(value: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
-export default function PostForm({ initialValues }: { initialValues?: PostFormValues }) {
+export default function PostForm({ initialValues, channels }: PostFormProps) {
   const router = useRouter();
   const isEdit = Boolean(initialValues?.id);
 
@@ -33,6 +44,7 @@ export default function PostForm({ initialValues }: { initialValues?: PostFormVa
   const [slugTouched, setSlugTouched] = useState(isEdit);
   const [body, setBody] = useState(initialValues?.body ?? "");
   const [published, setPublished] = useState(initialValues?.published ?? false);
+  const [channelId, setChannelId] = useState(initialValues?.channelId ?? "");
   const [products, setProducts] = useState<AdminProduct[]>([]);
   const [selectedProductId, setSelectedProductId] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -95,7 +107,7 @@ export default function PostForm({ initialValues }: { initialValues?: PostFormVa
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, slug, body, published }),
+        body: JSON.stringify({ title, slug, body, published, channelId }),
       });
 
       const result: { success: boolean; error?: string } = await response.json();
@@ -188,6 +200,29 @@ export default function PostForm({ initialValues }: { initialValues?: PostFormVa
           Use the picker above to insert a product card anywhere in the text.
         </p>
       </div>
+
+      {channels ? (
+        <div className="space-y-1">
+          <label htmlFor="channelId" className="text-sm font-medium text-white/70">
+            Channel (optional)
+          </label>
+          <select
+            id="channelId"
+            value={channelId}
+            onChange={(event) => setChannelId(event.target.value)}
+            className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:border-purple-400/50 focus:outline-none focus:ring-2 focus:ring-purple-400/20"
+          >
+            <option value="" className="bg-slate-900">
+              No channel
+            </option>
+            {channels.map((channel) => (
+              <option key={channel.id} value={channel.id} className="bg-slate-900">
+                {channel.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      ) : null}
 
       <div className="flex items-center gap-2">
         <input

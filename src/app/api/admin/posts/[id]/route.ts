@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { postSchema } from "@/lib/validation";
-import { getCurrentUser, canDeleteContent } from "@/lib/auth";
+import { getCurrentUser, canDeleteContent, getChannelScope } from "@/lib/auth";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
 }
 
 export async function GET(_request: Request, { params }: RouteParams) {
+  const currentUser = await getCurrentUser();
   const { id } = await params;
   const post = await prisma.post.findUnique({ where: { id } });
 
@@ -15,10 +16,22 @@ export async function GET(_request: Request, { params }: RouteParams) {
     return NextResponse.json({ success: false, error: "Post not found" }, { status: 404 });
   }
 
+  const channelScope = currentUser ? getChannelScope(currentUser) : null;
+
+  if (channelScope && post.channelId !== channelScope) {
+    return NextResponse.json({ success: false, error: "Post not found" }, { status: 404 });
+  }
+
   return NextResponse.json({ success: true, data: post });
 }
 
 export async function PATCH(request: Request, { params }: RouteParams) {
+  const currentUser = await getCurrentUser();
+
+  if (!currentUser) {
+    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+  }
+
   const { id } = await params;
   const body: unknown = await request.json().catch(() => null);
   const parsed = postSchema.safeParse(body);
@@ -39,8 +52,30 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     );
   }
 
+  const channelScope = getChannelScope(currentUser);
+
   try {
-    const post = await prisma.post.update({ where: { id }, data: parsed.data });
+    const existing = await prisma.post.findUnique({ where: { id } });
+
+    if (!existing) {
+      return NextResponse.json({ success: false, error: "Post not found" }, { status: 404 });
+    }
+
+    if (channelScope && existing.channelId !== channelScope) {
+      return NextResponse.json({ success: false, error: "Post not found" }, { status: 404 });
+    }
+
+    const post = await prisma.post.update({
+      where: { id },
+      data: {
+        title: parsed.data.title,
+        slug: parsed.data.slug,
+        body: parsed.data.body,
+        published: parsed.data.published,
+        channelId: channelScope ?? (parsed.data.channelId || null),
+      },
+    });
+
     return NextResponse.json({ success: true, data: post });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Failed to update post";

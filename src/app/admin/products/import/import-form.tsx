@@ -153,7 +153,8 @@ export default function ImportForm() {
 
         <p className="text-xs text-white/40">
           Expected columns: <code>name</code>, <code>description</code>, <code>price</code>{" "}
-          (optional), <code>category</code> (optional), <code>affiliateUrl</code>,{" "}
+          (optional), <code>category</code> (optional), <code>channel</code> (optional — created
+          automatically if it doesn&apos;t exist yet), <code>affiliateUrl</code>,{" "}
           <code>imageUrl</code> (a direct link to an image).{" "}
           <a
             href="/templates/product-import-template.xlsx"
@@ -199,6 +200,7 @@ export default function ImportForm() {
                   <th className="px-3 py-2 text-left font-medium text-white/60">Name</th>
                   <th className="px-3 py-2 text-left font-medium text-white/60">Price</th>
                   <th className="px-3 py-2 text-left font-medium text-white/60">Category</th>
+                  <th className="px-3 py-2 text-left font-medium text-white/60">Channel</th>
                   <th className="px-3 py-2 text-left font-medium text-white/60">Affiliate URL</th>
                   <th className="px-3 py-2 text-left font-medium text-white/60">Status</th>
                 </tr>
@@ -220,6 +222,7 @@ export default function ImportForm() {
                     </td>
                     <td className="px-3 py-2 text-white/50">{row.data?.price || "-"}</td>
                     <td className="px-3 py-2 text-white/50">{row.data?.category || "-"}</td>
+                    <td className="px-3 py-2 text-white/50">{row.data?.channel || "-"}</td>
                     <td className="max-w-xs truncate px-3 py-2 text-white/50">
                       {row.data?.affiliateUrl ?? "-"}
                     </td>

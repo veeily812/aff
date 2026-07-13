@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUser, canDeleteContent } from "@/lib/auth";
+import { getCurrentUser, canDeleteContent, getChannelScope } from "@/lib/auth";
 import DeletePostButton from "./delete-post-button";
 
 export const dynamic = "force-dynamic";
@@ -8,8 +8,10 @@ export const dynamic = "force-dynamic";
 export default async function AdminPostsPage() {
   const currentUser = await getCurrentUser();
   const canDelete = Boolean(currentUser && canDeleteContent(currentUser.role));
+  const channelScope = currentUser ? getChannelScope(currentUser) : null;
 
   const posts = await prisma.post.findMany({
+    where: channelScope ? { channelId: channelScope } : {},
     orderBy: { createdAt: "desc" },
   });
 

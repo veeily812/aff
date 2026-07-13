@@ -13,7 +13,7 @@ export async function GET() {
 
   const users = await prisma.user.findMany({
     orderBy: { createdAt: "desc" },
-    select: { id: true, email: true, role: true, createdAt: true },
+    select: { id: true, email: true, role: true, createdAt: true, channel: { select: { name: true } } },
   });
 
   return NextResponse.json({ success: true, data: users });
@@ -59,6 +59,7 @@ export async function POST(request: Request) {
       email: parsed.data.email,
       passwordHash,
       role: parsed.data.role,
+      channelId: parsed.data.role === "CHANNEL_STAFF" ? parsed.data.channelId || null : null,
     },
     select: { id: true, email: true, role: true, createdAt: true },
   });

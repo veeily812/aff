@@ -2,9 +2,14 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { uploadImage } from "@/lib/supabase";
 import { productSchema } from "@/lib/validation";
+import { getCurrentUser, getChannelScope } from "@/lib/auth";
 
 export async function GET() {
+  const currentUser = await getCurrentUser();
+  const channelScope = currentUser ? getChannelScope(currentUser) : null;
+
   const products = await prisma.product.findMany({
+    where: channelScope ? { channelId: channelScope } : {},
     orderBy: { createdAt: "desc" },
   });
 
@@ -12,6 +17,12 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const currentUser = await getCurrentUser();
+
+  if (!currentUser) {
+    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+  }
+
   const formData = await request.formData();
   const image = formData.get("image");
 
@@ -20,6 +31,7 @@ export async function POST(request: Request) {
     description: formData.get("description"),
     price: formData.get("price"),
     category: formData.get("category"),
+    channelId: formData.get("channelId"),
     affiliateUrl: formData.get("affiliateUrl"),
   });
 
@@ -37,6 +49,8 @@ export async function POST(request: Request) {
     );
   }
 
+  const channelScope = getChannelScope(currentUser);
+
   try {
     const imageUrl = await uploadImage(image, `products/${Date.now()}-${image.name}`);
 
@@ -46,6 +60,7 @@ export async function POST(request: Request) {
         description: parsed.data.description,
         price: parsed.data.price || null,
         category: parsed.data.category || null,
+        channelId: channelScope ?? (parsed.data.channelId || null),
         affiliateUrl: parsed.data.affiliateUrl,
         imageUrl,
       },

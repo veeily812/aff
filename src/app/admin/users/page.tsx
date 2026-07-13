@@ -11,6 +11,7 @@ const ROLE_LABELS: Record<string, string> = {
   SECONDARY_ADMIN: "Secondary Admin",
   MANAGER: "Manager",
   STAFF: "Staff",
+  CHANNEL_STAFF: "Channel Staff",
 };
 
 export default async function AdminUsersPage() {
@@ -22,7 +23,13 @@ export default async function AdminUsersPage() {
 
   const users = await prisma.user.findMany({
     orderBy: { createdAt: "desc" },
-    select: { id: true, email: true, role: true, createdAt: true },
+    select: {
+      id: true,
+      email: true,
+      role: true,
+      createdAt: true,
+      channel: { select: { name: true } },
+    },
   });
 
   return (
@@ -49,7 +56,8 @@ export default async function AdminUsersPage() {
               <div className="min-w-0 flex-1">
                 <p className="truncate font-medium text-white">{user.email}</p>
                 <p className="mt-1 text-sm text-white/50">
-                  {ROLE_LABELS[user.role] ?? user.role} &middot;{" "}
+                  {ROLE_LABELS[user.role] ?? user.role}
+                  {user.channel ? ` (${user.channel.name})` : ""} &middot;{" "}
                   {new Date(user.createdAt).toLocaleDateString("en-US", {
                     year: "numeric",
                     month: "long",

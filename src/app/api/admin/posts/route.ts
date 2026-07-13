@@ -1,9 +1,14 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { postSchema } from "@/lib/validation";
+import { getCurrentUser, getChannelScope } from "@/lib/auth";
 
 export async function GET() {
+  const currentUser = await getCurrentUser();
+  const channelScope = currentUser ? getChannelScope(currentUser) : null;
+
   const posts = await prisma.post.findMany({
+    where: channelScope ? { channelId: channelScope } : {},
     orderBy: { createdAt: "desc" },
   });
 
@@ -11,6 +16,12 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const currentUser = await getCurrentUser();
+
+  if (!currentUser) {
+    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+  }
+
   const body: unknown = await request.json().catch(() => null);
   const parsed = postSchema.safeParse(body);
 
@@ -30,7 +41,17 @@ export async function POST(request: Request) {
     );
   }
 
-  const post = await prisma.post.create({ data: parsed.data });
+  const channelScope = getChannelScope(currentUser);
+
+  const post = await prisma.post.create({
+    data: {
+      title: parsed.data.title,
+      slug: parsed.data.slug,
+      body: parsed.data.body,
+      published: parsed.data.published,
+      channelId: channelScope ?? (parsed.data.channelId || null),
+    },
+  });
 
   return NextResponse.json({ success: true, data: post }, { status: 201 });
 }

@@ -12,6 +12,8 @@ const HEADER_ALIASES: Record<string, keyof ProductImportRow> = {
   category: "category",
   categories: "category",
   type: "category",
+  channel: "channel",
+  channelname: "channel",
   affiliateurl: "affiliateUrl",
   affiliatelink: "affiliateUrl",
   affiliate: "affiliateUrl",

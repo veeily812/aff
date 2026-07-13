@@ -5,6 +5,7 @@ export const productSchema = z.object({
   description: z.string().trim().min(1, "Description is required").max(2000),
   price: z.string().trim().max(50).optional().or(z.literal("")),
   category: z.string().trim().max(100).optional().or(z.literal("")),
+  channelId: z.string().trim().max(200).optional().or(z.literal("")),
   affiliateUrl: z.string().trim().url("Must be a valid URL"),
 });
 
@@ -15,6 +16,7 @@ export const productImportRowSchema = z.object({
   description: z.string().trim().min(1, "Description is required").max(2000),
   price: z.string().trim().max(50).optional().or(z.literal("")),
   category: z.string().trim().max(100).optional().or(z.literal("")),
+  channel: z.string().trim().max(100).optional().or(z.literal("")),
   affiliateUrl: z.string().trim().url("Affiliate URL must be a valid URL"),
   imageUrl: z.string().trim().url("Image URL must be a valid URL"),
 });
@@ -31,11 +33,12 @@ export const postSchema = z.object({
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Slug must be lowercase, alphanumeric, and hyphen-separated"),
   body: z.string().trim().min(1, "Body is required"),
   published: z.boolean(),
+  channelId: z.string().trim().max(200).optional().or(z.literal("")),
 });
 
 export type PostInput = z.infer<typeof postSchema>;
 
-const roleEnum = z.enum(["OWNER", "SECONDARY_ADMIN", "MANAGER", "STAFF"]);
+const roleEnum = z.enum(["OWNER", "SECONDARY_ADMIN", "MANAGER", "STAFF", "CHANNEL_STAFF"]);
 
 export const loginSchema = z.object({
   email: z.string().trim().toLowerCase().email("Must be a valid email"),
@@ -47,14 +50,32 @@ export const setupSchema = z.object({
   password: z.string().min(8, "Password must be at least 8 characters"),
 });
 
-export const userCreateSchema = z.object({
-  email: z.string().trim().toLowerCase().email("Must be a valid email"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
-  role: roleEnum,
-});
+const withChannelRequirement = <T extends { role: z.infer<typeof roleEnum>; channelId?: string }>(
+  schema: z.ZodType<T>
+) =>
+  schema.refine((data) => data.role !== "CHANNEL_STAFF" || Boolean(data.channelId), {
+    message: "A channel is required for the Channel Staff role",
+    path: ["channelId"],
+  });
 
-export const userUpdateSchema = z.object({
-  email: z.string().trim().toLowerCase().email("Must be a valid email"),
-  password: z.string().min(8, "Password must be at least 8 characters").optional().or(z.literal("")),
-  role: roleEnum,
+export const userCreateSchema = withChannelRequirement(
+  z.object({
+    email: z.string().trim().toLowerCase().email("Must be a valid email"),
+    password: z.string().min(8, "Password must be at least 8 characters"),
+    role: roleEnum,
+    channelId: z.string().trim().max(200).optional().or(z.literal("")),
+  })
+);
+
+export const userUpdateSchema = withChannelRequirement(
+  z.object({
+    email: z.string().trim().toLowerCase().email("Must be a valid email"),
+    password: z.string().min(8, "Password must be at least 8 characters").optional().or(z.literal("")),
+    role: roleEnum,
+    channelId: z.string().trim().max(200).optional().or(z.literal("")),
+  })
+);
+
+export const channelSchema = z.object({
+  name: z.string().trim().min(1, "Name is required").max(100),
 });

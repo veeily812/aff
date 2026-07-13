@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import type { Role } from "@/lib/permissions";
-import { canAccessUsersPage } from "@/lib/permissions";
+import { canAccessUsersPage, canManageChannels } from "@/lib/permissions";
 
 interface AdminNavProps {
   role: Role | null;
@@ -20,6 +20,7 @@ export default function AdminNav({ role }: AdminNavProps) {
   const links = [
     { href: "/admin/products", label: "Products" },
     { href: "/admin/posts", label: "Posts" },
+    ...(role && canManageChannels(role) ? [{ href: "/admin/channels", label: "Channels" }] : []),
     ...(role && canAccessUsersPage(role) ? [{ href: "/admin/users", label: "Users" }] : []),
   ];
 

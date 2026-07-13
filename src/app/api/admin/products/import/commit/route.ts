@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { productImportRowSchema } from "@/lib/validation";
-import { getCurrentUser, canImportContent } from "@/lib/auth";
+import { getCurrentUser, canImportContent, getChannelScope } from "@/lib/auth";
 
 const commitSchema = z.object({
   rows: z.array(productImportRowSchema).min(1).max(500),
@@ -25,12 +25,27 @@ export async function POST(request: Request) {
     );
   }
 
+  const channelScope = getChannelScope(currentUser);
+
+  const channelNames = [...new Set(parsed.data.rows.map((row) => row.channel).filter(Boolean))] as string[];
+  const channelIdByName = new Map<string, string>();
+
+  for (const name of channelNames) {
+    const channel = await prisma.channel.upsert({
+      where: { name },
+      create: { name },
+      update: {},
+    });
+    channelIdByName.set(name, channel.id);
+  }
+
   const result = await prisma.product.createMany({
     data: parsed.data.rows.map((row) => ({
       name: row.name,
       description: row.description,
       price: row.price || null,
       category: row.category || null,
+      channelId: channelScope ?? (row.channel ? channelIdByName.get(row.channel) : null) ?? null,
       affiliateUrl: row.affiliateUrl,
       imageUrl: row.imageUrl,
     })),

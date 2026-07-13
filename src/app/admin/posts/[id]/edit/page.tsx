@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { getCurrentUser, getChannelScope } from "@/lib/auth";
 import PostForm from "../../post-form";
 
 interface EditPostPageProps {
@@ -7,12 +8,25 @@ interface EditPostPageProps {
 }
 
 export default async function EditPostPage({ params }: EditPostPageProps) {
+  const currentUser = await getCurrentUser();
   const { id } = await params;
   const post = await prisma.post.findUnique({ where: { id } });
 
   if (!post) {
     notFound();
   }
+
+  const channelScope = currentUser ? getChannelScope(currentUser) : null;
+
+  if (channelScope && post.channelId !== channelScope) {
+    notFound();
+  }
+
+  const showChannelField = currentUser?.role !== "CHANNEL_STAFF";
+
+  const channels = showChannelField
+    ? await prisma.channel.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } })
+    : undefined;
 
   return (
     <div className="space-y-6">
@@ -24,7 +38,9 @@ export default async function EditPostPage({ params }: EditPostPageProps) {
           slug: post.slug,
           body: post.body,
           published: post.published,
+          channelId: post.channelId,
         }}
+        channels={channels}
       />
     </div>
   );

@@ -17,19 +17,25 @@ export default async function EditUserPage({ params }: EditUserPageProps) {
   const { id } = await params;
   const user = await prisma.user.findUnique({
     where: { id },
-    select: { id: true, email: true, role: true },
+    select: { id: true, email: true, role: true, channelId: true },
   });
 
   if (!user || !canManageTargetRole(currentUser.role, user.role)) {
     notFound();
   }
 
+  const channels = await prisma.channel.findMany({
+    orderBy: { name: "asc" },
+    select: { id: true, name: true },
+  });
+
   return (
     <div className="space-y-6">
       <h1 className="gradient-text text-2xl font-bold">Edit User</h1>
       <UserForm
-        initialValues={{ id: user.id, email: user.email, role: user.role }}
+        initialValues={{ id: user.id, email: user.email, role: user.role, channelId: user.channelId }}
         assignableRoles={assignableRoles(currentUser.role)}
+        channels={channels}
       />
     </div>
   );

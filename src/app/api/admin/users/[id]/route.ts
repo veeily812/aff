@@ -18,7 +18,7 @@ export async function GET(_request: Request, { params }: RouteParams) {
   const { id } = await params;
   const user = await prisma.user.findUnique({
     where: { id },
-    select: { id: true, email: true, role: true, createdAt: true },
+    select: { id: true, email: true, role: true, createdAt: true, channelId: true },
   });
 
   if (!user) {
@@ -78,6 +78,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     data: {
       email: parsed.data.email,
       role: parsed.data.role,
+      channelId: parsed.data.role === "CHANNEL_STAFF" ? parsed.data.channelId || null : null,
       ...(parsed.data.password ? { passwordHash: await bcrypt.hash(parsed.data.password, 12) } : {}),
     },
     select: { id: true, email: true, role: true, createdAt: true },

@@ -4,25 +4,32 @@ import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
+interface ChannelOption {
+  id: string;
+  name: string;
+}
+
 interface ProductFormValues {
   id?: string;
   name: string;
   description: string;
   price: string;
   category?: string;
+  channelId?: string | null;
   affiliateUrl: string;
   imageUrl?: string;
 }
 
 interface ProductFormProps {
   initialValues?: ProductFormValues;
+  channels?: ChannelOption[];
 }
 
 const inputClass =
   "w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-white/30 focus:border-purple-400/50 focus:outline-none focus:ring-2 focus:ring-purple-400/20";
 const labelClass = "text-sm font-medium text-white/70";
 
-export default function ProductForm({ initialValues }: ProductFormProps) {
+export default function ProductForm({ initialValues, channels }: ProductFormProps) {
   const router = useRouter();
   const isEdit = Boolean(initialValues?.id);
 
@@ -30,6 +37,7 @@ export default function ProductForm({ initialValues }: ProductFormProps) {
   const [description, setDescription] = useState(initialValues?.description ?? "");
   const [price, setPrice] = useState(initialValues?.price ?? "");
   const [category, setCategory] = useState(initialValues?.category ?? "");
+  const [channelId, setChannelId] = useState(initialValues?.channelId ?? "");
   const [affiliateUrl, setAffiliateUrl] = useState(initialValues?.affiliateUrl ?? "");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -51,6 +59,7 @@ export default function ProductForm({ initialValues }: ProductFormProps) {
     formData.set("description", description);
     formData.set("price", price);
     formData.set("category", category);
+    formData.set("channelId", channelId);
     formData.set("affiliateUrl", affiliateUrl);
 
     if (imageFile) {
@@ -132,6 +141,29 @@ export default function ProductForm({ initialValues }: ProductFormProps) {
           className={inputClass}
         />
       </div>
+
+      {channels ? (
+        <div className="space-y-1">
+          <label htmlFor="channelId" className={labelClass}>
+            Channel (optional)
+          </label>
+          <select
+            id="channelId"
+            value={channelId}
+            onChange={(event) => setChannelId(event.target.value)}
+            className={inputClass}
+          >
+            <option value="" className="bg-slate-900">
+              No channel
+            </option>
+            {channels.map((channel) => (
+              <option key={channel.id} value={channel.id} className="bg-slate-900">
+                {channel.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      ) : null}
 
       <div className="space-y-1">
         <label htmlFor="affiliateUrl" className={labelClass}>

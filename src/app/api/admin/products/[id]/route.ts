@@ -2,13 +2,14 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { deleteImage, storagePathFromPublicUrl, uploadImage } from "@/lib/supabase";
 import { productSchema } from "@/lib/validation";
-import { getCurrentUser, canDeleteContent } from "@/lib/auth";
+import { getCurrentUser, canDeleteContent, getChannelScope } from "@/lib/auth";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
 }
 
 export async function GET(_request: Request, { params }: RouteParams) {
+  const currentUser = await getCurrentUser();
   const { id } = await params;
   const product = await prisma.product.findUnique({ where: { id } });
 
@@ -16,10 +17,22 @@ export async function GET(_request: Request, { params }: RouteParams) {
     return NextResponse.json({ success: false, error: "Product not found" }, { status: 404 });
   }
 
+  const channelScope = currentUser ? getChannelScope(currentUser) : null;
+
+  if (channelScope && product.channelId !== channelScope) {
+    return NextResponse.json({ success: false, error: "Product not found" }, { status: 404 });
+  }
+
   return NextResponse.json({ success: true, data: product });
 }
 
 export async function PATCH(request: Request, { params }: RouteParams) {
+  const currentUser = await getCurrentUser();
+
+  if (!currentUser) {
+    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+  }
+
   const { id } = await params;
   const formData = await request.formData();
   const image = formData.get("image");
@@ -29,6 +42,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     description: formData.get("description"),
     price: formData.get("price"),
     category: formData.get("category"),
+    channelId: formData.get("channelId"),
     affiliateUrl: formData.get("affiliateUrl"),
   });
 
@@ -39,10 +53,16 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     );
   }
 
+  const channelScope = getChannelScope(currentUser);
+
   try {
     const existing = await prisma.product.findUnique({ where: { id } });
 
     if (!existing) {
+      return NextResponse.json({ success: false, error: "Product not found" }, { status: 404 });
+    }
+
+    if (channelScope && existing.channelId !== channelScope) {
       return NextResponse.json({ success: false, error: "Product not found" }, { status: 404 });
     }
 
@@ -64,6 +84,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
         description: parsed.data.description,
         price: parsed.data.price || null,
         category: parsed.data.category || null,
+        channelId: channelScope ?? (parsed.data.channelId || null),
         affiliateUrl: parsed.data.affiliateUrl,
         imageUrl,
       },

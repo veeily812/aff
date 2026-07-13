@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUser, canDeleteContent, canImportContent } from "@/lib/auth";
+import { getCurrentUser, canDeleteContent, canImportContent, getChannelScope } from "@/lib/auth";
 import DeleteProductButton from "./delete-product-button";
 
 export const dynamic = "force-dynamic";
@@ -10,8 +10,10 @@ export default async function AdminProductsPage() {
   const currentUser = await getCurrentUser();
   const canDelete = Boolean(currentUser && canDeleteContent(currentUser.role));
   const canImport = Boolean(currentUser && canImportContent(currentUser.role));
+  const channelScope = currentUser ? getChannelScope(currentUser) : null;
 
   const products = await prisma.product.findMany({
+    where: channelScope ? { channelId: channelScope } : {},
     orderBy: { createdAt: "desc" },
   });
 

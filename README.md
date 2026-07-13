@@ -39,7 +39,7 @@ npm install
 npx prisma migrate dev --name init
 ```
 
-This creates the `Product`, `Post`, and `User` tables in your Supabase database.
+This creates the `Product`, `Post`, `User`, and `Channel` tables in your Supabase database.
 
 ## 4. Run locally
 
@@ -58,12 +58,21 @@ The Owner (and Secondary Admins) can create more accounts at **`/admin/users`**:
 
 | Role | Products/Posts | Delete | Bulk Import | Manage Users |
 |---|---|---|---|---|
-| **Owner** | Full | Yes | Yes | Create/edit/delete Secondary Admin, Manager, Staff |
-| **Secondary Admin** | Full | Yes | Yes | Create/edit/delete Manager, Staff only |
+| **Owner** | Full | Yes | Yes | Create/edit/delete Secondary Admin, Manager, Staff, Channel Staff |
+| **Secondary Admin** | Full | Yes | Yes | Create/edit/delete Manager, Staff, Channel Staff only |
 | **Manager** | Full | Yes | Yes | No access |
 | **Staff** | Create/edit only | No | No | No access |
+| **Channel Staff** | Create/edit, **one channel only** | No | No | No access |
 
 Note: nobody can edit or delete an Owner account through the Users page (including the Owner editing themselves) — that's a deliberate guard against lockouts and privilege escalation. If you need to change the Owner's own password, that currently requires a direct database update.
+
+### Channels (scoping a user to one product line)
+
+**Channels** (`/admin/channels`, Owner/Secondary Admin only) group products and posts — e.g. "Fashion" vs "Electronics" vs a different marketplace. Any role can optionally tag a product/post with a channel via a dropdown on its form.
+
+**Channel Staff** is a role scoped to exactly one channel: when creating that account you must pick a channel, and from then on that person's Products/Posts pages, the product picker in the post editor, and every API route only show/accept items from their assigned channel — they have no visibility into other channels or that they even exist. This is for bringing on someone (a new product line, a new collaborator) without giving them any insight into your other data.
+
+Deleting a channel is blocked while any Channel Staff account is still assigned to it (reassign or delete those users first); products/posts tagged with a deleted channel just lose that tag.
 
 ## How content works
 
