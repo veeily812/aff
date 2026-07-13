@@ -5,12 +5,19 @@ import {
   parseCsvText,
   parseXlsxBuffer,
 } from "@/lib/spreadsheet-import";
+import { getCurrentUser, canImportContent } from "@/lib/auth";
 
 const sheetUrlSchema = z.object({
   sheetUrl: z.string().trim().url(),
 });
 
 export async function POST(request: Request) {
+  const currentUser = await getCurrentUser();
+
+  if (!currentUser || !canImportContent(currentUser.role)) {
+    return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
+  }
+
   const contentType = request.headers.get("content-type") ?? "";
 
   try {

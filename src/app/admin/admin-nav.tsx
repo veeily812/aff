@@ -2,19 +2,26 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import type { Role } from "@/lib/permissions";
+import { canAccessUsersPage } from "@/lib/permissions";
 
-const links = [
-  { href: "/admin/products", label: "Products" },
-  { href: "/admin/posts", label: "Posts" },
-];
+interface AdminNavProps {
+  role: Role | null;
+}
 
-export default function AdminNav() {
+export default function AdminNav({ role }: AdminNavProps) {
   const pathname = usePathname();
   const router = useRouter();
 
-  if (pathname === "/admin/login") {
+  if (pathname === "/admin/login" || pathname === "/admin/setup") {
     return null;
   }
+
+  const links = [
+    { href: "/admin/products", label: "Products" },
+    { href: "/admin/posts", label: "Posts" },
+    ...(role && canAccessUsersPage(role) ? [{ href: "/admin/users", label: "Users" }] : []),
+  ];
 
   async function handleLogout() {
     await fetch("/api/admin/logout", { method: "POST" });

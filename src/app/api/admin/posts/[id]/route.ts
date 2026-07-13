@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { postSchema } from "@/lib/validation";
+import { getCurrentUser, canDeleteContent } from "@/lib/auth";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -48,6 +49,12 @@ export async function PATCH(request: Request, { params }: RouteParams) {
 }
 
 export async function DELETE(_request: Request, { params }: RouteParams) {
+  const currentUser = await getCurrentUser();
+
+  if (!currentUser || !canDeleteContent(currentUser.role)) {
+    return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
+  }
+
   const { id } = await params;
 
   try {

@@ -34,3 +34,27 @@ export const postSchema = z.object({
 });
 
 export type PostInput = z.infer<typeof postSchema>;
+
+const roleEnum = z.enum(["OWNER", "SECONDARY_ADMIN", "MANAGER", "STAFF"]);
+
+export const loginSchema = z.object({
+  email: z.string().trim().toLowerCase().email("Must be a valid email"),
+  password: z.string().min(1, "Password is required"),
+});
+
+export const setupSchema = z.object({
+  email: z.string().trim().toLowerCase().email("Must be a valid email"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+});
+
+export const userCreateSchema = z.object({
+  email: z.string().trim().toLowerCase().email("Must be a valid email"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+  role: roleEnum,
+});
+
+export const userUpdateSchema = z.object({
+  email: z.string().trim().toLowerCase().email("Must be a valid email"),
+  password: z.string().min(8, "Password must be at least 8 characters").optional().or(z.literal("")),
+  role: roleEnum,
+});

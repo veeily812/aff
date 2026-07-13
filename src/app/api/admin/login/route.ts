@@ -1,43 +1,40 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { z } from "zod";
+import { prisma } from "@/lib/prisma";
 import { getAdminSession } from "@/lib/session";
-
-const loginSchema = z.object({
-  password: z.string().min(1),
-});
+import { loginSchema } from "@/lib/validation";
 
 export async function POST(request: Request) {
-  const passwordHash = process.env.ADMIN_PASSWORD_HASH;
-
-  if (!passwordHash) {
-    return NextResponse.json(
-      { success: false, error: "Admin password is not configured" },
-      { status: 500 }
-    );
-  }
-
   const body: unknown = await request.json().catch(() => null);
   const parsed = loginSchema.safeParse(body);
 
   if (!parsed.success) {
     return NextResponse.json(
-      { success: false, error: "Password is required" },
+      { success: false, error: "A valid email and password are required" },
       { status: 400 }
     );
   }
 
-  const isValid = await bcrypt.compare(parsed.data.password, passwordHash);
+  const user = await prisma.user.findUnique({ where: { email: parsed.data.email } });
+
+  if (!user) {
+    return NextResponse.json(
+      { success: false, error: "Incorrect email or password" },
+      { status: 401 }
+    );
+  }
+
+  const isValid = await bcrypt.compare(parsed.data.password, user.passwordHash);
 
   if (!isValid) {
     return NextResponse.json(
-      { success: false, error: "Incorrect password" },
+      { success: false, error: "Incorrect email or password" },
       { status: 401 }
     );
   }
 
   const session = await getAdminSession();
-  session.isAdmin = true;
+  session.userId = user.id;
   await session.save();
 
   return NextResponse.json({ success: true });

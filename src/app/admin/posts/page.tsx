@@ -1,10 +1,14 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { getCurrentUser, canDeleteContent } from "@/lib/auth";
 import DeletePostButton from "./delete-post-button";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminPostsPage() {
+  const currentUser = await getCurrentUser();
+  const canDelete = Boolean(currentUser && canDeleteContent(currentUser.role));
+
   const posts = await prisma.post.findMany({
     orderBy: { createdAt: "desc" },
   });
@@ -47,7 +51,7 @@ export default async function AdminPostsPage() {
                 >
                   Edit
                 </Link>
-                <DeletePostButton postId={post.id} />
+                {canDelete ? <DeletePostButton postId={post.id} /> : null}
               </div>
             </li>
           ))}

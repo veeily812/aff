@@ -5,7 +5,7 @@ A blog-style site for embedding affiliate products (image, description, price, a
 - **Framework:** Next.js (App Router) + TypeScript + Tailwind CSS
 - **Database:** Postgres via [Supabase](https://supabase.com)
 - **Image storage:** Supabase Storage
-- **Admin auth:** single-password session (no multi-user accounts)
+- **Admin auth:** multi-user accounts with roles (Owner, Secondary Admin, Manager, Staff)
 - **Hosting target:** Vercel
 
 ## 1. Create a Supabase project
@@ -28,12 +28,9 @@ cp .env.example .env
 - `DATABASE_URL` / `DIRECT_URL` — Supabase Postgres pooler connection strings (see above)
 - `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` / `SUPABASE_SERVICE_ROLE_KEY` — from Supabase API settings
 - `SUPABASE_STORAGE_BUCKET` — bucket name (`product-images` by default)
-- `ADMIN_PASSWORD_HASH` — generate with:
-  ```bash
-  npm run hash-password -- "your-chosen-password"
-  ```
-  bcrypt hashes contain `$` characters, and Next.js expands `$VAR` syntax in `.env` files — escape every `$` as `\$` in the value or the hash will get silently truncated.
 - `SESSION_SECRET` — any random string 32+ characters, e.g. `openssl rand -base64 32`
+
+User accounts are **not** configured via env vars — they live in the database and are created through the web UI (see below).
 
 ## 3. Install dependencies and set up the database
 
@@ -42,7 +39,7 @@ npm install
 npx prisma migrate dev --name init
 ```
 
-This creates the `Product` and `Post` tables in your Supabase database.
+This creates the `Product`, `Post`, and `User` tables in your Supabase database.
 
 ## 4. Run locally
 
@@ -51,7 +48,22 @@ npm run dev
 ```
 
 - Public site: [http://localhost:3000](http://localhost:3000)
-- Admin dashboard: [http://localhost:3000/admin/login](http://localhost:3000/admin/login) (log in with the password you hashed above)
+- Admin dashboard: [http://localhost:3000/admin/login](http://localhost:3000/admin/login)
+
+## Accounts and roles
+
+The very first time you visit `/admin/login` (or `/admin/products`, etc.) with an empty database, you're redirected to **`/admin/setup`** — a one-time page to create the **Owner** account (email + password, typed directly into the browser). After that, `/admin/setup` stops working and everyone logs in at `/admin/login`.
+
+The Owner (and Secondary Admins) can create more accounts at **`/admin/users`**:
+
+| Role | Products/Posts | Delete | Bulk Import | Manage Users |
+|---|---|---|---|---|
+| **Owner** | Full | Yes | Yes | Create/edit/delete Secondary Admin, Manager, Staff |
+| **Secondary Admin** | Full | Yes | Yes | Create/edit/delete Manager, Staff only |
+| **Manager** | Full | Yes | Yes | No access |
+| **Staff** | Create/edit only | No | No | No access |
+
+Note: nobody can edit or delete an Owner account through the Users page (including the Owner editing themselves) — that's a deliberate guard against lockouts and privilege escalation. If you need to change the Owner's own password, that currently requires a direct database update.
 
 ## How content works
 

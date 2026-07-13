@@ -1,0 +1,77 @@
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { prisma } from "@/lib/prisma";
+import { getCurrentUser, canAccessUsersPage, canManageTargetRole } from "@/lib/auth";
+import DeleteUserButton from "./delete-user-button";
+
+export const dynamic = "force-dynamic";
+
+const ROLE_LABELS: Record<string, string> = {
+  OWNER: "Owner",
+  SECONDARY_ADMIN: "Secondary Admin",
+  MANAGER: "Manager",
+  STAFF: "Staff",
+};
+
+export default async function AdminUsersPage() {
+  const currentUser = await getCurrentUser();
+
+  if (!currentUser || !canAccessUsersPage(currentUser.role)) {
+    notFound();
+  }
+
+  const users = await prisma.user.findMany({
+    orderBy: { createdAt: "desc" },
+    select: { id: true, email: true, role: true, createdAt: true },
+  });
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="gradient-text text-2xl font-bold">Users</h1>
+        <Link
+          href="/admin/users/new"
+          className="gradient-button rounded-lg px-4 py-2 text-sm font-semibold text-white"
+        >
+          New User
+        </Link>
+      </div>
+
+      <ul className="space-y-3">
+        {users.map((user) => {
+          const canManage = canManageTargetRole(currentUser.role, user.role);
+
+          return (
+            <li
+              key={user.id}
+              className="glass-card flex items-center gap-4 rounded-xl p-4"
+            >
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-medium text-white">{user.email}</p>
+                <p className="mt-1 text-sm text-white/50">
+                  {ROLE_LABELS[user.role] ?? user.role} &middot;{" "}
+                  {new Date(user.createdAt).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </p>
+              </div>
+              {canManage ? (
+                <div className="flex shrink-0 items-center gap-3">
+                  <Link
+                    href={`/admin/users/${user.id}/edit`}
+                    className="text-sm text-white/60 transition-colors hover:text-white"
+                  >
+                    Edit
+                  </Link>
+                  <DeleteUserButton userId={user.id} />
+                </div>
+              ) : null}
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}

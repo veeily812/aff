@@ -1,11 +1,16 @@
 import Link from "next/link";
 import Image from "next/image";
 import { prisma } from "@/lib/prisma";
+import { getCurrentUser, canDeleteContent, canImportContent } from "@/lib/auth";
 import DeleteProductButton from "./delete-product-button";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminProductsPage() {
+  const currentUser = await getCurrentUser();
+  const canDelete = Boolean(currentUser && canDeleteContent(currentUser.role));
+  const canImport = Boolean(currentUser && canImportContent(currentUser.role));
+
   const products = await prisma.product.findMany({
     orderBy: { createdAt: "desc" },
   });
@@ -15,12 +20,14 @@ export default async function AdminProductsPage() {
       <div className="flex items-center justify-between">
         <h1 className="gradient-text text-2xl font-bold">Products</h1>
         <div className="flex items-center gap-3">
-          <Link
-            href="/admin/products/import"
-            className="glass-card rounded-lg px-4 py-2 text-sm font-medium text-white/80 transition-colors hover:text-white"
-          >
-            Import from File/Sheet
-          </Link>
+          {canImport ? (
+            <Link
+              href="/admin/products/import"
+              className="glass-card rounded-lg px-4 py-2 text-sm font-medium text-white/80 transition-colors hover:text-white"
+            >
+              Import from File/Sheet
+            </Link>
+          ) : null}
           <Link
             href="/admin/products/new"
             className="gradient-button rounded-lg px-4 py-2 text-sm font-semibold text-white"
@@ -60,7 +67,7 @@ export default async function AdminProductsPage() {
                 >
                   Edit
                 </Link>
-                <DeleteProductButton productId={product.id} />
+                {canDelete ? <DeleteProductButton productId={product.id} /> : null}
               </div>
             </li>
           ))}

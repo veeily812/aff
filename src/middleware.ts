@@ -6,7 +6,12 @@ export const config = {
   matcher: ["/admin/:path*", "/api/admin/:path*"],
 };
 
-const PUBLIC_PATHS = new Set(["/admin/login", "/api/admin/login"]);
+const PUBLIC_PATHS = new Set([
+  "/admin/login",
+  "/api/admin/login",
+  "/admin/setup",
+  "/api/admin/setup",
+]);
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -27,7 +32,7 @@ export async function middleware(request: NextRequest) {
       password: sessionOptions.password,
     });
 
-    if (!session.isAdmin) {
+    if (!session.userId) {
       return isApiRoute ? unauthorized() : redirectToLogin(request);
     }
 

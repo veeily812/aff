@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { getIronSession, type SessionOptions } from "iron-session";
 
 export interface AdminSessionData {
-  isAdmin?: boolean;
+  userId?: string;
 }
 
 function getSessionSecret(): string {
