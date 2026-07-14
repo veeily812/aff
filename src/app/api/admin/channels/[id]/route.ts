@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUser, canManageChannels } from "@/lib/auth";
+import { getCurrentUser, canManageChannels, getOrganizationScope } from "@/lib/auth";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -14,6 +14,13 @@ export async function DELETE(_request: Request, { params }: RouteParams) {
   }
 
   const { id } = await params;
+  const organizationScope = getOrganizationScope(currentUser);
+
+  const existing = await prisma.channel.findUnique({ where: { id } });
+
+  if (!existing || existing.organizationId !== organizationScope) {
+    return NextResponse.json({ success: false, error: "Channel not found" }, { status: 404 });
+  }
 
   const assignedUserCount = await prisma.user.count({ where: { channelId: id } });
 

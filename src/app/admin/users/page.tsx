@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUser, canAccessUsersPage, canManageTargetRole } from "@/lib/auth";
+import { getCurrentUser, canAccessUsersPage, canManageTargetRole, getOrganizationScope } from "@/lib/auth";
 import DeleteUserButton from "./delete-user-button";
 
 export const dynamic = "force-dynamic";
@@ -21,7 +21,10 @@ export default async function AdminUsersPage() {
     notFound();
   }
 
+  const organizationScope = getOrganizationScope(currentUser);
+
   const users = await prisma.user.findMany({
+    where: { organizationId: organizationScope },
     orderBy: { createdAt: "desc" },
     select: {
       id: true,

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { postSchema } from "@/lib/validation";
-import { getCurrentUser, canDeleteContent, getChannelScope } from "@/lib/auth";
+import { getCurrentUser, canDeleteContent, getChannelScope, getOrganizationScope } from "@/lib/auth";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -9,6 +9,11 @@ interface RouteParams {
 
 export async function GET(_request: Request, { params }: RouteParams) {
   const currentUser = await getCurrentUser();
+
+  if (!currentUser) {
+    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+  }
+
   const { id } = await params;
   const post = await prisma.post.findUnique({ where: { id } });
 
@@ -16,7 +21,12 @@ export async function GET(_request: Request, { params }: RouteParams) {
     return NextResponse.json({ success: false, error: "Post not found" }, { status: 404 });
   }
 
-  const channelScope = currentUser ? getChannelScope(currentUser) : null;
+  const organizationScope = getOrganizationScope(currentUser);
+  const channelScope = getChannelScope(currentUser);
+
+  if (post.organizationId !== organizationScope) {
+    return NextResponse.json({ success: false, error: "Post not found" }, { status: 404 });
+  }
 
   if (channelScope && post.channelId !== channelScope) {
     return NextResponse.json({ success: false, error: "Post not found" }, { status: 404 });
@@ -52,12 +62,17 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     );
   }
 
+  const organizationScope = getOrganizationScope(currentUser);
   const channelScope = getChannelScope(currentUser);
 
   try {
     const existing = await prisma.post.findUnique({ where: { id } });
 
     if (!existing) {
+      return NextResponse.json({ success: false, error: "Post not found" }, { status: 404 });
+    }
+
+    if (existing.organizationId !== organizationScope) {
       return NextResponse.json({ success: false, error: "Post not found" }, { status: 404 });
     }
 
@@ -91,8 +106,24 @@ export async function DELETE(_request: Request, { params }: RouteParams) {
   }
 
   const { id } = await params;
+  const organizationScope = getOrganizationScope(currentUser);
+  const channelScope = getChannelScope(currentUser);
 
   try {
+    const existing = await prisma.post.findUnique({ where: { id } });
+
+    if (!existing) {
+      return NextResponse.json({ success: false, error: "Post not found" }, { status: 404 });
+    }
+
+    if (existing.organizationId !== organizationScope) {
+      return NextResponse.json({ success: false, error: "Post not found" }, { status: 404 });
+    }
+
+    if (channelScope && existing.channelId !== channelScope) {
+      return NextResponse.json({ success: false, error: "Post not found" }, { status: 404 });
+    }
+
     await prisma.post.delete({ where: { id } });
     return NextResponse.json({ success: true });
   } catch (error: unknown) {

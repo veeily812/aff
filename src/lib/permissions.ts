@@ -41,3 +41,16 @@ export function canImportContent(role: Role): boolean {
 export function getChannelScope(user: { role: Role; channelId: string | null }): string | null {
   return user.role === "CHANNEL_STAFF" ? user.channelId : null;
 }
+
+/**
+ * Every authenticated user is scoped to exactly one organization - there is no
+ * cross-organization role. Throws rather than returning null so a caller can never
+ * accidentally build an unscoped query from a corrupt/pre-migration user record.
+ */
+export function getOrganizationScope(user: { organizationId: string | null }): string {
+  if (!user.organizationId) {
+    throw new Error("User has no organizationId - cannot scope query to an organization");
+  }
+
+  return user.organizationId;
+}

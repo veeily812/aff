@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUser, canManageChannels } from "@/lib/auth";
+import { getCurrentUser, canManageChannels, getOrganizationScope } from "@/lib/auth";
 import { channelSchema } from "@/lib/validation";
 
 export async function GET() {
@@ -10,7 +10,10 @@ export async function GET() {
     return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
   }
 
+  const organizationScope = getOrganizationScope(currentUser);
+
   const channels = await prisma.channel.findMany({
+    where: { organizationId: organizationScope },
     orderBy: { name: "asc" },
   });
 
@@ -43,7 +46,11 @@ export async function POST(request: Request) {
     );
   }
 
-  const channel = await prisma.channel.create({ data: { name: parsed.data.name } });
+  const organizationScope = getOrganizationScope(currentUser);
+
+  const channel = await prisma.channel.create({
+    data: { name: parsed.data.name, organizationId: organizationScope },
+  });
 
   return NextResponse.json({ success: true, data: channel }, { status: 201 });
 }

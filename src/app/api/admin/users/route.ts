@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUser, canAccessUsersPage, canManageTargetRole } from "@/lib/auth";
+import { getCurrentUser, canAccessUsersPage, canManageTargetRole, getOrganizationScope } from "@/lib/auth";
 import { userCreateSchema } from "@/lib/validation";
 
 export async function GET() {
@@ -11,7 +11,10 @@ export async function GET() {
     return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
   }
 
+  const organizationScope = getOrganizationScope(currentUser);
+
   const users = await prisma.user.findMany({
+    where: { organizationId: organizationScope },
     orderBy: { createdAt: "desc" },
     select: { id: true, email: true, role: true, createdAt: true, channel: { select: { name: true } } },
   });
@@ -53,6 +56,7 @@ export async function POST(request: Request) {
   }
 
   const passwordHash = await bcrypt.hash(parsed.data.password, 12);
+  const organizationScope = getOrganizationScope(currentUser);
 
   const user = await prisma.user.create({
     data: {
@@ -60,6 +64,7 @@ export async function POST(request: Request) {
       passwordHash,
       role: parsed.data.role,
       channelId: parsed.data.role === "CHANNEL_STAFF" ? parsed.data.channelId || null : null,
+      organizationId: organizationScope,
     },
     select: { id: true, email: true, role: true, createdAt: true },
   });

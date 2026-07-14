@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { deleteImage, storagePathFromPublicUrl, uploadImage } from "@/lib/supabase";
 import { productSchema } from "@/lib/validation";
-import { getCurrentUser, canDeleteContent, getChannelScope } from "@/lib/auth";
+import { getCurrentUser, canDeleteContent, getChannelScope, getOrganizationScope } from "@/lib/auth";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -10,6 +10,11 @@ interface RouteParams {
 
 export async function GET(_request: Request, { params }: RouteParams) {
   const currentUser = await getCurrentUser();
+
+  if (!currentUser) {
+    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+  }
+
   const { id } = await params;
   const product = await prisma.product.findUnique({ where: { id } });
 
@@ -17,7 +22,12 @@ export async function GET(_request: Request, { params }: RouteParams) {
     return NextResponse.json({ success: false, error: "Product not found" }, { status: 404 });
   }
 
-  const channelScope = currentUser ? getChannelScope(currentUser) : null;
+  const organizationScope = getOrganizationScope(currentUser);
+  const channelScope = getChannelScope(currentUser);
+
+  if (product.organizationId !== organizationScope) {
+    return NextResponse.json({ success: false, error: "Product not found" }, { status: 404 });
+  }
 
   if (channelScope && product.channelId !== channelScope) {
     return NextResponse.json({ success: false, error: "Product not found" }, { status: 404 });
@@ -53,12 +63,17 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     );
   }
 
+  const organizationScope = getOrganizationScope(currentUser);
   const channelScope = getChannelScope(currentUser);
 
   try {
     const existing = await prisma.product.findUnique({ where: { id } });
 
     if (!existing) {
+      return NextResponse.json({ success: false, error: "Product not found" }, { status: 404 });
+    }
+
+    if (existing.organizationId !== organizationScope) {
       return NextResponse.json({ success: false, error: "Product not found" }, { status: 404 });
     }
 
@@ -105,8 +120,24 @@ export async function DELETE(_request: Request, { params }: RouteParams) {
   }
 
   const { id } = await params;
+  const organizationScope = getOrganizationScope(currentUser);
+  const channelScope = getChannelScope(currentUser);
 
   try {
+    const existing = await prisma.product.findUnique({ where: { id } });
+
+    if (!existing) {
+      return NextResponse.json({ success: false, error: "Product not found" }, { status: 404 });
+    }
+
+    if (existing.organizationId !== organizationScope) {
+      return NextResponse.json({ success: false, error: "Product not found" }, { status: 404 });
+    }
+
+    if (channelScope && existing.channelId !== channelScope) {
+      return NextResponse.json({ success: false, error: "Product not found" }, { status: 404 });
+    }
+
     const deleted = await prisma.product.delete({ where: { id } });
 
     const path = storagePathFromPublicUrl(deleted.imageUrl);

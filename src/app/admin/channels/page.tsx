@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUser, canManageChannels } from "@/lib/auth";
+import { getCurrentUser, canManageChannels, getOrganizationScope } from "@/lib/auth";
 import NewChannelForm from "./new-channel-form";
 import DeleteChannelButton from "./delete-channel-button";
 
@@ -13,7 +13,10 @@ export default async function AdminChannelsPage() {
     notFound();
   }
 
+  const organizationScope = getOrganizationScope(currentUser);
+
   const channels = await prisma.channel.findMany({
+    where: { organizationId: organizationScope },
     orderBy: { name: "asc" },
     include: { _count: { select: { products: true, posts: true, users: true } } },
   });

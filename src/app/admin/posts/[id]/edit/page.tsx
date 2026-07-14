@@ -1,6 +1,6 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUser, getChannelScope } from "@/lib/auth";
+import { getCurrentUser, getChannelScope, getOrganizationScope } from "@/lib/auth";
 import PostForm from "../../post-form";
 
 interface EditPostPageProps {
@@ -9,6 +9,11 @@ interface EditPostPageProps {
 
 export default async function EditPostPage({ params }: EditPostPageProps) {
   const currentUser = await getCurrentUser();
+
+  if (!currentUser) {
+    redirect("/admin/login");
+  }
+
   const { id } = await params;
   const post = await prisma.post.findUnique({ where: { id } });
 
@@ -16,16 +21,25 @@ export default async function EditPostPage({ params }: EditPostPageProps) {
     notFound();
   }
 
-  const channelScope = currentUser ? getChannelScope(currentUser) : null;
+  const organizationScope = getOrganizationScope(currentUser);
+  const channelScope = getChannelScope(currentUser);
+
+  if (post.organizationId !== organizationScope) {
+    notFound();
+  }
 
   if (channelScope && post.channelId !== channelScope) {
     notFound();
   }
 
-  const showChannelField = currentUser?.role !== "CHANNEL_STAFF";
+  const showChannelField = currentUser.role !== "CHANNEL_STAFF";
 
   const channels = showChannelField
-    ? await prisma.channel.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } })
+    ? await prisma.channel.findMany({
+        where: { organizationId: organizationScope },
+        orderBy: { name: "asc" },
+        select: { id: true, name: true },
+      })
     : undefined;
 
   return (

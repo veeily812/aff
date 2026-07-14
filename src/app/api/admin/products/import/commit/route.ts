@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { productImportRowSchema } from "@/lib/validation";
-import { getCurrentUser, canImportContent, getChannelScope } from "@/lib/auth";
+import { getCurrentUser, canImportContent, getChannelScope, getOrganizationScope } from "@/lib/auth";
 
 const commitSchema = z.object({
   rows: z.array(productImportRowSchema).min(1).max(500),
@@ -25,17 +25,21 @@ export async function POST(request: Request) {
     );
   }
 
+  const organizationScope = getOrganizationScope(currentUser);
   const channelScope = getChannelScope(currentUser);
 
   const channelNames = [...new Set(parsed.data.rows.map((row) => row.channel).filter(Boolean))] as string[];
   const channelIdByName = new Map<string, string>();
 
   for (const name of channelNames) {
-    const channel = await prisma.channel.upsert({
-      where: { name },
-      create: { name },
-      update: {},
+    const existingChannel = await prisma.channel.findFirst({
+      where: { name, organizationId: organizationScope },
     });
+
+    const channel =
+      existingChannel ??
+      (await prisma.channel.create({ data: { name, organizationId: organizationScope } }));
+
     channelIdByName.set(name, channel.id);
   }
 
@@ -46,6 +50,7 @@ export async function POST(request: Request) {
       price: row.price || null,
       category: row.category || null,
       channelId: channelScope ?? (row.channel ? channelIdByName.get(row.channel) : null) ?? null,
+      organizationId: organizationScope,
       affiliateUrl: row.affiliateUrl,
       imageUrl: row.imageUrl,
     })),

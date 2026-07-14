@@ -1,6 +1,12 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUser, canAccessUsersPage, canManageTargetRole, assignableRoles } from "@/lib/auth";
+import {
+  getCurrentUser,
+  canAccessUsersPage,
+  canManageTargetRole,
+  assignableRoles,
+  getOrganizationScope,
+} from "@/lib/auth";
 import UserForm from "../../user-form";
 
 interface EditUserPageProps {
@@ -14,17 +20,19 @@ export default async function EditUserPage({ params }: EditUserPageProps) {
     notFound();
   }
 
+  const organizationScope = getOrganizationScope(currentUser);
   const { id } = await params;
   const user = await prisma.user.findUnique({
     where: { id },
-    select: { id: true, email: true, role: true, channelId: true },
+    select: { id: true, email: true, role: true, channelId: true, organizationId: true },
   });
 
-  if (!user || !canManageTargetRole(currentUser.role, user.role)) {
+  if (!user || user.organizationId !== organizationScope || !canManageTargetRole(currentUser.role, user.role)) {
     notFound();
   }
 
   const channels = await prisma.channel.findMany({
+    where: { organizationId: organizationScope },
     orderBy: { name: "asc" },
     select: { id: true, name: true },
   });

@@ -2,14 +2,23 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { uploadImage } from "@/lib/supabase";
 import { productSchema } from "@/lib/validation";
-import { getCurrentUser, getChannelScope } from "@/lib/auth";
+import { getCurrentUser, getChannelScope, getOrganizationScope } from "@/lib/auth";
 
 export async function GET() {
   const currentUser = await getCurrentUser();
-  const channelScope = currentUser ? getChannelScope(currentUser) : null;
+
+  if (!currentUser) {
+    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+  }
+
+  const organizationScope = getOrganizationScope(currentUser);
+  const channelScope = getChannelScope(currentUser);
 
   const products = await prisma.product.findMany({
-    where: channelScope ? { channelId: channelScope } : {},
+    where: {
+      organizationId: organizationScope,
+      ...(channelScope ? { channelId: channelScope } : {}),
+    },
     orderBy: { createdAt: "desc" },
   });
 
@@ -49,6 +58,7 @@ export async function POST(request: Request) {
     );
   }
 
+  const organizationScope = getOrganizationScope(currentUser);
   const channelScope = getChannelScope(currentUser);
 
   try {
@@ -61,6 +71,7 @@ export async function POST(request: Request) {
         price: parsed.data.price || null,
         category: parsed.data.category || null,
         channelId: channelScope ?? (parsed.data.channelId || null),
+        organizationId: organizationScope,
         affiliateUrl: parsed.data.affiliateUrl,
         imageUrl,
       },
