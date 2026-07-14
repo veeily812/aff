@@ -35,8 +35,8 @@ model Organization {
 model Channel {
   id             String       @id @default(cuid())
   name           String       @unique
-  organizationId String?
-  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
   users          User[]
@@ -51,8 +51,8 @@ model User {
   role           Role
   channelId      String?
   channel        Channel?     @relation(fields: [channelId], references: [id])
-  organizationId String?
-  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
 }
@@ -67,8 +67,8 @@ model Product {
   affiliateUrl   String
   channelId      String?
   channel        Channel?     @relation(fields: [channelId], references: [id], onDelete: SetNull)
-  organizationId String?
-  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
 }
@@ -82,8 +82,8 @@ model Post {
   published      Boolean      @default(false)
   channelId      String?
   channel        Channel?     @relation(fields: [channelId], references: [id], onDelete: SetNull)
-  organizationId String?
-  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
 }

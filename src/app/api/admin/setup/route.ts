@@ -25,13 +25,29 @@ export async function POST(request: Request) {
   }
 
   const passwordHash = await bcrypt.hash(parsed.data.password, 12);
+  const baseSlug = parsed.data.email.split("@")[0].toLowerCase().replace(/[^a-z0-9]+/g, "-");
 
-  const owner = await prisma.user.create({
-    data: {
-      email: parsed.data.email,
-      passwordHash,
-      role: "OWNER",
-    },
+  const owner = await prisma.$transaction(async (tx) => {
+    let slug = baseSlug;
+    let suffix = 1;
+
+    while (await tx.organization.findUnique({ where: { slug } })) {
+      suffix += 1;
+      slug = `${baseSlug}-${suffix}`;
+    }
+
+    const organization = await tx.organization.create({
+      data: { name: parsed.data.email.split("@")[0], slug },
+    });
+
+    return tx.user.create({
+      data: {
+        email: parsed.data.email,
+        passwordHash,
+        role: "OWNER",
+        organizationId: organization.id,
+      },
+    });
   });
 
   const session = await getAdminSession();
