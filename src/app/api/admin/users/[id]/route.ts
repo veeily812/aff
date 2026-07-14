@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUser, canAccessUsersPage, canManageTargetRole } from "@/lib/auth";
+import { getCurrentUser, canAccessUsersPage, canManageTargetRole, getOrganizationScope } from "@/lib/auth";
 import { userUpdateSchema } from "@/lib/validation";
 
 interface RouteParams {
@@ -16,12 +16,13 @@ export async function GET(_request: Request, { params }: RouteParams) {
   }
 
   const { id } = await params;
+  const organizationScope = getOrganizationScope(currentUser);
   const user = await prisma.user.findUnique({
     where: { id },
-    select: { id: true, email: true, role: true, createdAt: true, channelId: true },
+    select: { id: true, email: true, role: true, createdAt: true, channelId: true, organizationId: true },
   });
 
-  if (!user) {
+  if (!user || user.organizationId !== organizationScope) {
     return NextResponse.json({ success: false, error: "User not found" }, { status: 404 });
   }
 
@@ -46,9 +47,10 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     );
   }
 
+  const organizationScope = getOrganizationScope(currentUser);
   const existing = await prisma.user.findUnique({ where: { id } });
 
-  if (!existing) {
+  if (!existing || existing.organizationId !== organizationScope) {
     return NextResponse.json({ success: false, error: "User not found" }, { status: 404 });
   }
 
@@ -103,9 +105,10 @@ export async function DELETE(_request: Request, { params }: RouteParams) {
     );
   }
 
+  const organizationScope = getOrganizationScope(currentUser);
   const existing = await prisma.user.findUnique({ where: { id } });
 
-  if (!existing) {
+  if (!existing || existing.organizationId !== organizationScope) {
     return NextResponse.json({ success: false, error: "User not found" }, { status: 404 });
   }
 

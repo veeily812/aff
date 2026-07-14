@@ -1,13 +1,24 @@
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser, getOrganizationScope } from "@/lib/auth";
 import ProductForm from "../product-form";
 
 export default async function NewProductPage() {
   const currentUser = await getCurrentUser();
-  const showChannelField = currentUser?.role !== "CHANNEL_STAFF";
+
+  if (!currentUser) {
+    redirect("/admin/login");
+  }
+
+  const showChannelField = currentUser.role !== "CHANNEL_STAFF";
+  const organizationScope = getOrganizationScope(currentUser);
 
   const channels = showChannelField
-    ? await prisma.channel.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } })
+    ? await prisma.channel.findMany({
+        where: { organizationId: organizationScope },
+        orderBy: { name: "asc" },
+        select: { id: true, name: true },
+      })
     : undefined;
 
   return (

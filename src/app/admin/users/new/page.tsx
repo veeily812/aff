@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUser, canAccessUsersPage, assignableRoles } from "@/lib/auth";
+import { getCurrentUser, canAccessUsersPage, assignableRoles, getOrganizationScope } from "@/lib/auth";
 import UserForm from "../user-form";
 
 export default async function NewUserPage() {
@@ -10,7 +10,10 @@ export default async function NewUserPage() {
     notFound();
   }
 
+  const organizationScope = getOrganizationScope(currentUser);
+
   const channels = await prisma.channel.findMany({
+    where: { organizationId: organizationScope },
     orderBy: { name: "asc" },
     select: { id: true, name: true },
   });
