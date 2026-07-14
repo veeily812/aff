@@ -50,6 +50,12 @@ export const setupSchema = z.object({
   password: z.string().min(8, "Password must be at least 8 characters"),
 });
 
+export const signupSchema = z.object({
+  organizationName: z.string().trim().min(1, "Store name is required").max(100),
+  email: z.string().trim().toLowerCase().email("Must be a valid email"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+});
+
 const withChannelRequirement = <T extends { role: z.infer<typeof roleEnum>; channelId?: string }>(
   schema: z.ZodType<T>
 ) =>

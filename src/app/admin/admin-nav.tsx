@@ -7,9 +7,11 @@ import { canAccessUsersPage, canManageChannels } from "@/lib/permissions";
 
 interface AdminNavProps {
   role: Role | null;
+  storeName: string | null;
+  storeSlug: string | null;
 }
 
-export default function AdminNav({ role }: AdminNavProps) {
+export default function AdminNav({ role, storeName, storeSlug }: AdminNavProps) {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -34,7 +36,9 @@ export default function AdminNav({ role }: AdminNavProps) {
     <nav className="glass-card sticky top-0 z-10 border-x-0 border-t-0">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
         <div className="flex items-center gap-6">
-          <span className="gradient-text font-bold">Admin</span>
+          <span className="gradient-text max-w-40 truncate font-bold" title={storeName ?? "Admin"}>
+            {storeName ?? "Admin"}
+          </span>
           {links.map((link) => (
             <Link
               key={link.href}
@@ -49,12 +53,24 @@ export default function AdminNav({ role }: AdminNavProps) {
             </Link>
           ))}
         </div>
-        <button
-          onClick={handleLogout}
-          className="text-sm text-white/50 transition-colors hover:text-white"
-        >
-          Log out
-        </button>
+        <div className="flex items-center gap-5">
+          {storeSlug ? (
+            <a
+              href={`/store/${storeSlug}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-purple-300 transition-colors hover:text-purple-200"
+            >
+              View my store ↗
+            </a>
+          ) : null}
+          <button
+            onClick={handleLogout}
+            className="text-sm text-white/50 transition-colors hover:text-white"
+          >
+            Log out
+          </button>
+        </div>
       </div>
     </nav>
   );

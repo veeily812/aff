@@ -3,8 +3,8 @@
   "configurations": [
     {
       "name": "dev",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
+      "runtimeExecutable": "/bin/sh",
+      "runtimeArgs": ["-c", "export PATH=\"/Users/vivianphung/.nvm/versions/node/v22.22.2/bin:$PATH\" && npm run dev"],
       "port": 3000
     }
   ]

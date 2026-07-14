@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { slugify } from "@/lib/slugify";
 
 interface PostFormValues {
   id?: string;
@@ -25,14 +26,6 @@ interface ChannelOption {
 interface PostFormProps {
   initialValues?: PostFormValues;
   channels?: ChannelOption[];
-}
-
-function slugify(value: string): string {
-  return value
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
 }
 
 export default function PostForm({ initialValues, channels }: PostFormProps) {
