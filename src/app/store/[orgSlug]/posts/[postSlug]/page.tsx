@@ -60,9 +60,9 @@ export default async function StorePostPage({ params }: StorePostPageProps) {
   const productsById = new Map(products.map((product) => [product.id, product]));
 
   return (
-    <article className="prose prose-invert glass-card animate-fade-in-up max-w-none rounded-2xl p-6 sm:p-10">
+    <article className="prose glass-card animate-fade-in-up max-w-none rounded-2xl p-6 sm:p-10">
       <h1 className="gradient-text">{post.title}</h1>
-      <p className="text-sm text-white/40">
+      <p className="text-sm text-black/50">
         {new Date(post.createdAt).toLocaleDateString("en-US", {
           year: "numeric",
           month: "long",

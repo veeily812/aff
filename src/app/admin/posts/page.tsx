@@ -31,14 +31,14 @@ export default async function AdminPostsPage() {
         <h1 className="gradient-text text-2xl font-bold">Posts</h1>
         <Link
           href="/admin/posts/new"
-          className="gradient-button rounded-lg px-4 py-2 text-sm font-semibold text-white"
+          className="gradient-button rounded-lg px-4 py-2 text-sm font-semibold text-black"
         >
           New Post
         </Link>
       </div>
 
       {posts.length === 0 ? (
-        <p className="text-sm text-white/50">No posts yet.</p>
+        <p className="text-sm text-black/50">No posts yet.</p>
       ) : (
         <ul className="space-y-3">
           {posts.map((post, index) => (
@@ -48,10 +48,10 @@ export default async function AdminPostsPage() {
               style={{ animationDelay: `${index * 40}ms` }}
             >
               <div className="min-w-0 flex-1">
-                <p className="truncate font-medium text-white">{post.title}</p>
-                <p className="truncate text-sm text-white/50">
+                <p className="truncate font-medium text-black">{post.title}</p>
+                <p className="truncate text-sm text-black/50">
                   /{post.slug} &middot;{" "}
-                  <span className={post.published ? "text-emerald-400" : "text-amber-400"}>
+                  <span className={post.published ? "text-emerald-700" : "text-amber-600"}>
                     {post.published ? "Published" : "Draft"}
                   </span>
                 </p>
@@ -59,7 +59,7 @@ export default async function AdminPostsPage() {
               <div className="flex shrink-0 items-center gap-3">
                 <Link
                   href={`/admin/posts/${post.id}/edit`}
-                  className="text-sm text-white/60 transition-colors hover:text-white"
+                  className="text-sm text-black/60 transition-colors hover:text-black"
                 >
                   Edit
                 </Link>

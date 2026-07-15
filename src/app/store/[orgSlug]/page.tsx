@@ -84,7 +84,7 @@ export default async function StorePage({ params, searchParams }: StorePageProps
     <div className="space-y-10">
       <div className="animate-fade-in-up">
         <h1 className="gradient-text text-4xl font-extrabold tracking-tight">{organization.name}</h1>
-        <p className="mt-3 text-white/60">Hand-picked product recommendations and roundups.</p>
+        <p className="mt-3 text-black/60">Hand-picked product recommendations and roundups.</p>
       </div>
 
       <div className="animate-fade-in-up space-y-4">
@@ -95,18 +95,18 @@ export default async function StorePage({ params, searchParams }: StorePageProps
             name="q"
             defaultValue={q ?? ""}
             placeholder="Search products..."
-            className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-white placeholder-white/30 focus:border-purple-400/50 focus:outline-none focus:ring-2 focus:ring-purple-400/20"
+            className="w-full rounded-lg border-2 border-black bg-white px-4 py-2 text-sm text-black placeholder-black/50 focus:border-violet-600 focus:outline-none focus:ring-2 focus:ring-violet-600/30"
           />
           <button
             type="submit"
-            className="gradient-button shrink-0 rounded-lg px-5 py-2 text-sm font-semibold text-white"
+            className="gradient-button shrink-0 rounded-lg px-5 py-2 text-sm font-semibold text-black"
           >
             Search
           </button>
           {q || category ? (
             <Link
               href={`/store/${organization.slug}`}
-              className="glass-card shrink-0 rounded-lg px-4 py-2 text-sm text-white/70 transition-colors hover:text-white"
+              className="glass-card shrink-0 rounded-lg px-4 py-2 text-sm text-black/70 transition-colors hover:text-black"
             >
               Clear
             </Link>
@@ -119,8 +119,8 @@ export default async function StorePage({ params, searchParams }: StorePageProps
               href={buildHref(organization.slug, q, undefined)}
               className={
                 !category
-                  ? "gradient-button rounded-full px-4 py-1.5 text-xs font-semibold text-white"
-                  : "glass-card rounded-full px-4 py-1.5 text-xs text-white/70 transition-colors hover:text-white"
+                  ? "gradient-button rounded-full px-4 py-1.5 text-xs font-semibold text-black"
+                  : "glass-card rounded-full px-4 py-1.5 text-xs text-black/70 transition-colors hover:text-black"
               }
             >
               All
@@ -131,8 +131,8 @@ export default async function StorePage({ params, searchParams }: StorePageProps
                 href={buildHref(organization.slug, q, cat)}
                 className={
                   category === cat
-                    ? "gradient-button rounded-full px-4 py-1.5 text-xs font-semibold text-white"
-                    : "glass-card rounded-full px-4 py-1.5 text-xs text-white/70 transition-colors hover:text-white"
+                    ? "gradient-button rounded-full px-4 py-1.5 text-xs font-semibold text-black"
+                    : "glass-card rounded-full px-4 py-1.5 text-xs text-black/70 transition-colors hover:text-black"
                 }
               >
                 {cat}
@@ -143,7 +143,7 @@ export default async function StorePage({ params, searchParams }: StorePageProps
       </div>
 
       {visiblePosts.length === 0 ? (
-        <p className="text-white/50">
+        <p className="text-black/50">
           {query || category
             ? "No products found matching your filters."
             : "No posts published yet. Check back soon."}
@@ -165,7 +165,7 @@ export default async function StorePage({ params, searchParams }: StorePageProps
                   className="flex items-center gap-4"
                 >
                   {product ? (
-                    <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-white/5">
+                    <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-white">
                       <Image
                         src={product.imageUrl}
                         alt={product.name}
@@ -176,10 +176,10 @@ export default async function StorePage({ params, searchParams }: StorePageProps
                     </div>
                   ) : null}
                   <div className="min-w-0 flex-1">
-                    <span className="text-xl font-semibold text-white transition-colors hover:text-pink-300">
+                    <span className="text-xl font-semibold text-black transition-colors hover:text-pink-600">
                       {post.title}
                     </span>
-                    <p className="mt-2 text-sm text-white/40">
+                    <p className="mt-2 text-sm text-black/50">
                       {new Date(post.createdAt).toLocaleDateString("en-US", {
                         year: "numeric",
                         month: "long",

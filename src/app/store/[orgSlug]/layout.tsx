@@ -30,7 +30,7 @@ export default async function StoreLayout({ children, params }: StoreLayoutProps
           >
             {organization.name}
           </Link>
-          <Link href="/" className="text-sm text-white/50 transition-colors hover:text-white">
+          <Link href="/" className="text-sm text-black/50 transition-colors hover:text-black">
             All stores
           </Link>
         </div>

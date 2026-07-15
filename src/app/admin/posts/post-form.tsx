@@ -122,7 +122,7 @@ export default function PostForm({ initialValues, channels }: PostFormProps) {
   return (
     <form onSubmit={handleSubmit} className="glass-card max-w-2xl space-y-4 rounded-2xl p-6">
       <div className="space-y-1">
-        <label htmlFor="title" className="text-sm font-medium text-white/70">
+        <label htmlFor="title" className="text-sm font-medium text-black/70">
           Title
         </label>
         <input
@@ -130,12 +130,12 @@ export default function PostForm({ initialValues, channels }: PostFormProps) {
           required
           value={title}
           onChange={(event) => handleTitleChange(event.target.value)}
-          className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-white/30 focus:border-purple-400/50 focus:outline-none focus:ring-2 focus:ring-purple-400/20"
+          className="w-full rounded-lg border-2 border-black bg-white px-3 py-2 text-sm text-black placeholder-black/50 focus:border-violet-600 focus:outline-none focus:ring-2 focus:ring-violet-600/30"
         />
       </div>
 
       <div className="space-y-1">
-        <label htmlFor="slug" className="text-sm font-medium text-white/70">
+        <label htmlFor="slug" className="text-sm font-medium text-black/70">
           Slug
         </label>
         <input
@@ -146,26 +146,26 @@ export default function PostForm({ initialValues, channels }: PostFormProps) {
             setSlugTouched(true);
             setSlug(event.target.value);
           }}
-          className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-white/30 focus:border-purple-400/50 focus:outline-none focus:ring-2 focus:ring-purple-400/20"
+          className="w-full rounded-lg border-2 border-black bg-white px-3 py-2 text-sm text-black placeholder-black/50 focus:border-violet-600 focus:outline-none focus:ring-2 focus:ring-violet-600/30"
         />
       </div>
 
       <div className="space-y-1">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <label htmlFor="body" className="text-sm font-medium text-white/70">
+          <label htmlFor="body" className="text-sm font-medium text-black/70">
             Body (Markdown)
           </label>
           <div className="flex min-w-0 items-center gap-2">
             <select
               value={selectedProductId}
               onChange={(event) => setSelectedProductId(event.target.value)}
-              className="w-40 shrink rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-xs text-white focus:border-purple-400/50 focus:outline-none"
+              className="w-40 shrink rounded-lg border-2 border-black bg-white px-2 py-1 text-xs text-black focus:border-violet-600 focus:outline-none"
             >
-              <option value="" className="bg-slate-900">
+              <option value="" className="bg-white">
                 Select product...
               </option>
               {products.map((product) => (
-                <option key={product.id} value={product.id} className="bg-slate-900">
+                <option key={product.id} value={product.id} className="bg-white">
                   {product.name}
                 </option>
               ))}
@@ -174,7 +174,7 @@ export default function PostForm({ initialValues, channels }: PostFormProps) {
               type="button"
               onClick={insertProductToken}
               disabled={!selectedProductId}
-              className="shrink-0 rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-xs text-white/80 transition-colors hover:text-white disabled:opacity-50"
+              className="shrink-0 rounded-lg border-2 border-black bg-white px-2 py-1 text-xs text-black/80 transition-colors hover:text-black disabled:opacity-50"
             >
               Insert Product
             </button>
@@ -187,29 +187,29 @@ export default function PostForm({ initialValues, channels }: PostFormProps) {
           rows={16}
           value={body}
           onChange={(event) => setBody(event.target.value)}
-          className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 font-mono text-sm text-white placeholder-white/30 focus:border-purple-400/50 focus:outline-none focus:ring-2 focus:ring-purple-400/20"
+          className="w-full rounded-lg border-2 border-black bg-white px-3 py-2 font-mono text-sm text-black placeholder-black/50 focus:border-violet-600 focus:outline-none focus:ring-2 focus:ring-violet-600/30"
         />
-        <p className="text-xs text-white/40">
+        <p className="text-xs text-black/50">
           Use the picker above to insert a product card anywhere in the text.
         </p>
       </div>
 
       {channels ? (
         <div className="space-y-1">
-          <label htmlFor="channelId" className="text-sm font-medium text-white/70">
+          <label htmlFor="channelId" className="text-sm font-medium text-black/70">
             Channel (optional)
           </label>
           <select
             id="channelId"
             value={channelId}
             onChange={(event) => setChannelId(event.target.value)}
-            className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:border-purple-400/50 focus:outline-none focus:ring-2 focus:ring-purple-400/20"
+            className="w-full rounded-lg border-2 border-black bg-white px-3 py-2 text-sm text-black focus:border-violet-600 focus:outline-none focus:ring-2 focus:ring-violet-600/30"
           >
-            <option value="" className="bg-slate-900">
+            <option value="" className="bg-white">
               No channel
             </option>
             {channels.map((channel) => (
-              <option key={channel.id} value={channel.id} className="bg-slate-900">
+              <option key={channel.id} value={channel.id} className="bg-white">
                 {channel.name}
               </option>
             ))}
@@ -223,19 +223,19 @@ export default function PostForm({ initialValues, channels }: PostFormProps) {
           type="checkbox"
           checked={published}
           onChange={(event) => setPublished(event.target.checked)}
-          className="h-4 w-4 rounded border-white/20 bg-white/5"
+          className="h-4 w-4 rounded border-black bg-white"
         />
-        <label htmlFor="published" className="text-sm text-white/70">
+        <label htmlFor="published" className="text-sm text-black/70">
           Published
         </label>
       </div>
 
-      {error ? <p className="text-sm text-red-400">{error}</p> : null}
+      {error ? <p className="text-sm text-red-600">{error}</p> : null}
 
       <button
         type="submit"
         disabled={isSubmitting}
-        className="gradient-button rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+        className="gradient-button rounded-lg px-4 py-2 text-sm font-semibold text-black disabled:opacity-50"
       >
         {isSubmitting ? "Saving..." : isEdit ? "Save Changes" : "Create Post"}
       </button>

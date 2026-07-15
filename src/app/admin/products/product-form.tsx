@@ -26,8 +26,8 @@ interface ProductFormProps {
 }
 
 const inputClass =
-  "w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-white/30 focus:border-purple-400/50 focus:outline-none focus:ring-2 focus:ring-purple-400/20";
-const labelClass = "text-sm font-medium text-white/70";
+  "w-full rounded-lg border-2 border-black bg-white px-3 py-2 text-sm text-black placeholder-black/50 focus:border-violet-600 focus:outline-none focus:ring-2 focus:ring-violet-600/30";
+const labelClass = "text-sm font-medium text-black/70";
 
 export default function ProductForm({ initialValues, channels }: ProductFormProps) {
   const router = useRouter();
@@ -153,11 +153,11 @@ export default function ProductForm({ initialValues, channels }: ProductFormProp
             onChange={(event) => setChannelId(event.target.value)}
             className={inputClass}
           >
-            <option value="" className="bg-slate-900">
+            <option value="" className="bg-white">
               No channel
             </option>
             {channels.map((channel) => (
-              <option key={channel.id} value={channel.id} className="bg-slate-900">
+              <option key={channel.id} value={channel.id} className="bg-white">
                 {channel.name}
               </option>
             ))}
@@ -185,7 +185,7 @@ export default function ProductForm({ initialValues, channels }: ProductFormProp
           Product Image {isEdit ? "(leave blank to keep current)" : ""}
         </label>
         {initialValues?.imageUrl ? (
-          <div className="relative mb-2 h-24 w-24 overflow-hidden rounded-lg bg-white/5">
+          <div className="relative mb-2 h-24 w-24 overflow-hidden rounded-lg bg-white">
             <Image src={initialValues.imageUrl} alt={name} fill className="object-cover" sizes="96px" />
           </div>
         ) : null}
@@ -194,16 +194,16 @@ export default function ProductForm({ initialValues, channels }: ProductFormProp
           type="file"
           accept="image/*"
           onChange={(event) => setImageFile(event.target.files?.[0] ?? null)}
-          className="w-full text-sm text-white/70"
+          className="w-full text-sm text-black/70"
         />
       </div>
 
-      {error ? <p className="text-sm text-red-400">{error}</p> : null}
+      {error ? <p className="text-sm text-red-600">{error}</p> : null}
 
       <button
         type="submit"
         disabled={isSubmitting}
-        className="gradient-button rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+        className="gradient-button rounded-lg px-4 py-2 text-sm font-semibold text-black disabled:opacity-50"
       >
         {isSubmitting ? "Saving..." : isEdit ? "Save Changes" : "Create Product"}
       </button>

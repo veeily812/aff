@@ -45,8 +45,8 @@ export default function AdminNav({ role, storeName, storeSlug }: AdminNavProps) 
               href={link.href}
               className={
                 pathname.startsWith(link.href)
-                  ? "text-sm font-semibold text-white"
-                  : "text-sm text-white/50 transition-colors hover:text-white"
+                  ? "text-sm font-semibold text-black"
+                  : "text-sm text-black/50 transition-colors hover:text-black"
               }
             >
               {link.label}
@@ -59,14 +59,14 @@ export default function AdminNav({ role, storeName, storeSlug }: AdminNavProps) 
               href={`/store/${storeSlug}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm text-purple-300 transition-colors hover:text-purple-200"
+              className="text-sm text-violet-700 transition-colors hover:text-violet-500"
             >
               View my store ↗
             </a>
           ) : null}
           <button
             onClick={handleLogout}
-            className="text-sm text-white/50 transition-colors hover:text-white"
+            className="text-sm text-black/50 transition-colors hover:text-black"
           >
             Log out
           </button>

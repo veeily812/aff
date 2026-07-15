@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 const inputClass =
-  "w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-white/30 focus:border-purple-400/50 focus:outline-none focus:ring-2 focus:ring-purple-400/20";
+  "w-full rounded-lg border-2 border-black bg-white px-3 py-2 text-sm text-black placeholder-black/50 focus:border-violet-600 focus:outline-none focus:ring-2 focus:ring-violet-600/30";
 
 export default function SignupForm() {
   const router = useRouter();
@@ -51,13 +51,13 @@ export default function SignupForm() {
       >
         <div>
           <h1 className="gradient-text text-xl font-bold">Create your store</h1>
-          <p className="mt-2 text-sm text-white/50">
+          <p className="mt-2 text-sm text-black/50">
             Your own space for affiliate products and posts — separate from everyone else&apos;s.
           </p>
         </div>
 
         <div className="space-y-1">
-          <label htmlFor="organizationName" className="text-sm font-medium text-white/70">
+          <label htmlFor="organizationName" className="text-sm font-medium text-black/70">
             Store name
           </label>
           <input
@@ -72,7 +72,7 @@ export default function SignupForm() {
         </div>
 
         <div className="space-y-1">
-          <label htmlFor="email" className="text-sm font-medium text-white/70">
+          <label htmlFor="email" className="text-sm font-medium text-black/70">
             Email
           </label>
           <input
@@ -86,7 +86,7 @@ export default function SignupForm() {
         </div>
 
         <div className="space-y-1">
-          <label htmlFor="password" className="text-sm font-medium text-white/70">
+          <label htmlFor="password" className="text-sm font-medium text-black/70">
             Password
           </label>
           <input
@@ -101,19 +101,19 @@ export default function SignupForm() {
           />
         </div>
 
-        {error ? <p className="text-sm text-red-400">{error}</p> : null}
+        {error ? <p className="text-sm text-red-600">{error}</p> : null}
 
         <button
           type="submit"
           disabled={isSubmitting}
-          className="gradient-button w-full rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+          className="gradient-button w-full rounded-lg px-4 py-2 text-sm font-semibold text-black disabled:opacity-50"
         >
           {isSubmitting ? "Creating your store..." : "Create my store"}
         </button>
 
-        <p className="text-center text-sm text-white/50">
+        <p className="text-center text-sm text-black/50">
           Already have an account?{" "}
-          <Link href="/admin/login" className="text-purple-300 hover:text-purple-200">
+          <Link href="/admin/login" className="text-violet-700 hover:text-violet-500">
             Sign in
           </Link>
         </p>

@@ -31,8 +31,8 @@ const ROLE_LABELS: Record<Role, string> = {
 };
 
 const inputClass =
-  "w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-white/30 focus:border-purple-400/50 focus:outline-none focus:ring-2 focus:ring-purple-400/20";
-const labelClass = "text-sm font-medium text-white/70";
+  "w-full rounded-lg border-2 border-black bg-white px-3 py-2 text-sm text-black placeholder-black/50 focus:border-violet-600 focus:outline-none focus:ring-2 focus:ring-violet-600/30";
+const labelClass = "text-sm font-medium text-black/70";
 
 export default function UserForm({ initialValues, assignableRoles, channels }: UserFormProps) {
   const router = useRouter();
@@ -123,7 +123,7 @@ export default function UserForm({ initialValues, assignableRoles, channels }: U
           className={inputClass}
         >
           {assignableRoles.map((option) => (
-            <option key={option} value={option} className="bg-slate-900">
+            <option key={option} value={option} className="bg-white">
               {ROLE_LABELS[option]}
             </option>
           ))}
@@ -142,29 +142,29 @@ export default function UserForm({ initialValues, assignableRoles, channels }: U
             onChange={(event) => setChannelId(event.target.value)}
             className={inputClass}
           >
-            <option value="" className="bg-slate-900">
+            <option value="" className="bg-white">
               Select channel...
             </option>
             {channels.map((channel) => (
-              <option key={channel.id} value={channel.id} className="bg-slate-900">
+              <option key={channel.id} value={channel.id} className="bg-white">
                 {channel.name}
               </option>
             ))}
           </select>
           {channels.length === 0 ? (
-            <p className="text-xs text-amber-400">
+            <p className="text-xs text-amber-600">
               No channels exist yet — create one on the Channels page first.
             </p>
           ) : null}
         </div>
       ) : null}
 
-      {error ? <p className="text-sm text-red-400">{error}</p> : null}
+      {error ? <p className="text-sm text-red-600">{error}</p> : null}
 
       <button
         type="submit"
         disabled={isSubmitting}
-        className="gradient-button rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+        className="gradient-button rounded-lg px-4 py-2 text-sm font-semibold text-black disabled:opacity-50"
       >
         {isSubmitting ? "Saving..." : isEdit ? "Save Changes" : "Create User"}
       </button>

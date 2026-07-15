@@ -111,7 +111,7 @@ export default function ImportForm() {
 
       <div className="glass-card max-w-xl space-y-4 rounded-2xl p-6">
         <div className="space-y-1">
-          <label htmlFor="file" className="text-sm font-medium text-white/70">
+          <label htmlFor="file" className="text-sm font-medium text-black/70">
             Upload Excel or CSV file
           </label>
           <input
@@ -122,18 +122,18 @@ export default function ImportForm() {
               setFile(event.target.files?.[0] ?? null);
               setSheetUrl("");
             }}
-            className="w-full text-sm text-white/70"
+            className="w-full text-sm text-black/70"
           />
         </div>
 
-        <div className="flex items-center gap-3 text-xs text-white/30">
-          <div className="h-px flex-1 bg-white/10" />
+        <div className="flex items-center gap-3 text-xs text-black/40">
+          <div className="h-px flex-1 bg-black/5" />
           OR
-          <div className="h-px flex-1 bg-white/10" />
+          <div className="h-px flex-1 bg-black/5" />
         </div>
 
         <div className="space-y-1">
-          <label htmlFor="sheetUrl" className="text-sm font-medium text-white/70">
+          <label htmlFor="sheetUrl" className="text-sm font-medium text-black/70">
             Public Google Sheets link
           </label>
           <input
@@ -144,14 +144,14 @@ export default function ImportForm() {
               setFile(null);
             }}
             placeholder="https://docs.google.com/spreadsheets/d/..."
-            className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-white/30 focus:border-purple-400/50 focus:outline-none focus:ring-2 focus:ring-purple-400/20"
+            className="w-full rounded-lg border-2 border-black bg-white px-3 py-2 text-sm text-black placeholder-black/50 focus:border-violet-600 focus:outline-none focus:ring-2 focus:ring-violet-600/30"
           />
-          <p className="text-xs text-white/40">
+          <p className="text-xs text-black/50">
             Sheet must be shared as &quot;Anyone with the link&quot; or published to the web.
           </p>
         </div>
 
-        <p className="text-xs text-white/40">
+        <p className="text-xs text-black/50">
           Expected columns: <code>name</code>, <code>description</code>, <code>price</code>{" "}
           (optional), <code>category</code> (optional), <code>channel</code> (optional — created
           automatically if it doesn&apos;t exist yet), <code>affiliateUrl</code>,{" "}
@@ -159,18 +159,18 @@ export default function ImportForm() {
           <a
             href="/templates/product-import-template.xlsx"
             download
-            className="text-purple-300 underline hover:text-purple-200"
+            className="text-violet-700 underline hover:text-violet-500"
           >
             Download sample template
           </a>
         </p>
 
-        {error ? <p className="text-sm text-red-400">{error}</p> : null}
+        {error ? <p className="text-sm text-red-600">{error}</p> : null}
 
         <button
           onClick={handlePreview}
           disabled={isParsing || (!file && !sheetUrl.trim())}
-          className="gradient-button rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+          className="gradient-button rounded-lg px-4 py-2 text-sm font-semibold text-black disabled:opacity-50"
         >
           {isParsing ? "Parsing..." : "Preview"}
         </button>
@@ -179,35 +179,35 @@ export default function ImportForm() {
       {rows.length > 0 ? (
         <div className="animate-fade-in-up space-y-4">
           <div className="flex items-center justify-between">
-            <p className="text-sm text-white/60">
+            <p className="text-sm text-black/60">
               {validCount} of {rows.length} rows are valid. {selected.size} selected.
             </p>
             <button
               onClick={handleImport}
               disabled={isImporting || selected.size === 0}
-              className="gradient-button rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+              className="gradient-button rounded-lg px-4 py-2 text-sm font-semibold text-black disabled:opacity-50"
             >
               {isImporting ? "Importing..." : `Import ${selected.size} Product(s)`}
             </button>
           </div>
 
           <div className="glass-card overflow-x-auto rounded-2xl">
-            <table className="min-w-full divide-y divide-white/10 text-sm">
-              <thead className="bg-white/5">
+            <table className="min-w-full divide-y divide-black/20 text-sm">
+              <thead className="bg-white">
                 <tr>
                   <th className="px-3 py-2 text-left" />
-                  <th className="px-3 py-2 text-left font-medium text-white/60">Row</th>
-                  <th className="px-3 py-2 text-left font-medium text-white/60">Name</th>
-                  <th className="px-3 py-2 text-left font-medium text-white/60">Price</th>
-                  <th className="px-3 py-2 text-left font-medium text-white/60">Category</th>
-                  <th className="px-3 py-2 text-left font-medium text-white/60">Channel</th>
-                  <th className="px-3 py-2 text-left font-medium text-white/60">Affiliate URL</th>
-                  <th className="px-3 py-2 text-left font-medium text-white/60">Status</th>
+                  <th className="px-3 py-2 text-left font-medium text-black/60">Row</th>
+                  <th className="px-3 py-2 text-left font-medium text-black/60">Name</th>
+                  <th className="px-3 py-2 text-left font-medium text-black/60">Price</th>
+                  <th className="px-3 py-2 text-left font-medium text-black/60">Category</th>
+                  <th className="px-3 py-2 text-left font-medium text-black/60">Channel</th>
+                  <th className="px-3 py-2 text-left font-medium text-black/60">Affiliate URL</th>
+                  <th className="px-3 py-2 text-left font-medium text-black/60">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5">
+              <tbody className="divide-y divide-black/10">
                 {rows.map((row) => (
-                  <tr key={row.rowNumber} className={row.data ? "" : "bg-red-500/10"}>
+                  <tr key={row.rowNumber} className={row.data ? "" : "bg-red-100"}>
                     <td className="px-3 py-2">
                       <input
                         type="checkbox"
@@ -216,21 +216,21 @@ export default function ImportForm() {
                         onChange={() => toggleRow(row.rowNumber)}
                       />
                     </td>
-                    <td className="px-3 py-2 text-white/50">{row.rowNumber}</td>
-                    <td className="px-3 py-2 text-white">
+                    <td className="px-3 py-2 text-black/50">{row.rowNumber}</td>
+                    <td className="px-3 py-2 text-black">
                       {row.data?.name ?? row.raw.name ?? "-"}
                     </td>
-                    <td className="px-3 py-2 text-white/50">{row.data?.price || "-"}</td>
-                    <td className="px-3 py-2 text-white/50">{row.data?.category || "-"}</td>
-                    <td className="px-3 py-2 text-white/50">{row.data?.channel || "-"}</td>
-                    <td className="max-w-xs truncate px-3 py-2 text-white/50">
+                    <td className="px-3 py-2 text-black/50">{row.data?.price || "-"}</td>
+                    <td className="px-3 py-2 text-black/50">{row.data?.category || "-"}</td>
+                    <td className="px-3 py-2 text-black/50">{row.data?.channel || "-"}</td>
+                    <td className="max-w-xs truncate px-3 py-2 text-black/50">
                       {row.data?.affiliateUrl ?? "-"}
                     </td>
                     <td className="px-3 py-2">
                       {row.data ? (
-                        <span className="text-emerald-400">Valid</span>
+                        <span className="text-emerald-700">Valid</span>
                       ) : (
-                        <span className="text-red-400">{row.errors.join(", ")}</span>
+                        <span className="text-red-600">{row.errors.join(", ")}</span>
                       )}
                     </td>
                   </tr>

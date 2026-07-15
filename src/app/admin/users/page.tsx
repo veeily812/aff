@@ -41,7 +41,7 @@ export default async function AdminUsersPage() {
         <h1 className="gradient-text text-2xl font-bold">Users</h1>
         <Link
           href="/admin/users/new"
-          className="gradient-button rounded-lg px-4 py-2 text-sm font-semibold text-white"
+          className="gradient-button rounded-lg px-4 py-2 text-sm font-semibold text-black"
         >
           New User
         </Link>
@@ -57,8 +57,8 @@ export default async function AdminUsersPage() {
               className="glass-card flex items-center gap-4 rounded-xl p-4"
             >
               <div className="min-w-0 flex-1">
-                <p className="truncate font-medium text-white">{user.email}</p>
-                <p className="mt-1 text-sm text-white/50">
+                <p className="truncate font-medium text-black">{user.email}</p>
+                <p className="mt-1 text-sm text-black/50">
                   {ROLE_LABELS[user.role] ?? user.role}
                   {user.channel ? ` (${user.channel.name})` : ""} &middot;{" "}
                   {new Date(user.createdAt).toLocaleDateString("en-US", {
@@ -72,7 +72,7 @@ export default async function AdminUsersPage() {
                 <div className="flex shrink-0 items-center gap-3">
                   <Link
                     href={`/admin/users/${user.id}/edit`}
-                    className="text-sm text-white/60 transition-colors hover:text-white"
+                    className="text-sm text-black/60 transition-colors hover:text-black"
                   >
                     Edit
                   </Link>
