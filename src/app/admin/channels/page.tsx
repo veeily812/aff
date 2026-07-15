@@ -28,14 +28,14 @@ export default async function AdminChannelsPage() {
       <NewChannelForm />
 
       {channels.length === 0 ? (
-        <p className="text-sm text-white/50">No channels yet.</p>
+        <p className="text-sm text-black/50">No channels yet.</p>
       ) : (
         <ul className="space-y-3">
           {channels.map((channel) => (
             <li key={channel.id} className="glass-card flex items-center gap-4 rounded-xl p-4">
               <div className="min-w-0 flex-1">
-                <p className="truncate font-medium text-white">{channel.name}</p>
-                <p className="mt-1 text-sm text-white/50">
+                <p className="truncate font-medium text-black">{channel.name}</p>
+                <p className="mt-1 text-sm text-black/50">
                   {channel._count.products} product(s) &middot; {channel._count.posts} post(s)
                   &middot; {channel._count.users} user(s)
                 </p>

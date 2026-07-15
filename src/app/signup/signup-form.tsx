@@ -2,9 +2,14 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
-export default function LoginForm() {
+const inputClass =
+  "w-full rounded-lg border-2 border-black bg-white px-3 py-2 text-sm text-black placeholder-black/50 focus:border-violet-600 focus:outline-none focus:ring-2 focus:ring-violet-600/30";
+
+export default function SignupForm() {
   const router = useRouter();
+  const [organizationName, setOrganizationName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -16,16 +21,16 @@ export default function LoginForm() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("/api/admin/login", {
+      const response = await fetch("/api/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ organizationName, email, password }),
       });
 
       const result: { success: boolean; error?: string } = await response.json();
 
       if (!result.success) {
-        setError(result.error ?? "Login failed");
+        setError(result.error ?? "Signup failed");
         return;
       }
 
@@ -39,12 +44,32 @@ export default function LoginForm() {
   }
 
   return (
-    <div className="-m-4 -my-8 flex min-h-screen items-center justify-center px-4 sm:-m-8">
+    <div className="bg-app-gradient flex min-h-screen items-center justify-center px-4">
       <form
         onSubmit={handleSubmit}
         className="glass-card animate-fade-in-up w-full max-w-sm space-y-4 rounded-2xl p-8"
       >
-        <h1 className="gradient-text text-xl font-bold">Admin Login</h1>
+        <div>
+          <h1 className="gradient-text text-xl font-bold">Create your store</h1>
+          <p className="mt-2 text-sm text-black/50">
+            Your own space for affiliate products and posts — separate from everyone else&apos;s.
+          </p>
+        </div>
+
+        <div className="space-y-1">
+          <label htmlFor="organizationName" className="text-sm font-medium text-black/70">
+            Store name
+          </label>
+          <input
+            id="organizationName"
+            required
+            maxLength={100}
+            value={organizationName}
+            onChange={(event) => setOrganizationName(event.target.value)}
+            placeholder="Vy's Beauty Picks"
+            className={inputClass}
+          />
+        </div>
 
         <div className="space-y-1">
           <label htmlFor="email" className="text-sm font-medium text-black/70">
@@ -56,7 +81,7 @@ export default function LoginForm() {
             required
             value={email}
             onChange={(event) => setEmail(event.target.value)}
-            className="w-full rounded-lg border-2 border-black bg-white px-3 py-2 text-sm text-black focus:border-violet-600 focus:outline-none focus:ring-2 focus:ring-violet-600/30"
+            className={inputClass}
           />
         </div>
 
@@ -68,9 +93,11 @@ export default function LoginForm() {
             id="password"
             type="password"
             required
+            minLength={8}
             value={password}
             onChange={(event) => setPassword(event.target.value)}
-            className="w-full rounded-lg border-2 border-black bg-white px-3 py-2 text-sm text-black focus:border-violet-600 focus:outline-none focus:ring-2 focus:ring-violet-600/30"
+            placeholder="At least 8 characters"
+            className={inputClass}
           />
         </div>
 
@@ -81,8 +108,15 @@ export default function LoginForm() {
           disabled={isSubmitting}
           className="gradient-button w-full rounded-lg px-4 py-2 text-sm font-semibold text-black disabled:opacity-50"
         >
-          {isSubmitting ? "Signing in..." : "Sign in"}
+          {isSubmitting ? "Creating your store..." : "Create my store"}
         </button>
+
+        <p className="text-center text-sm text-black/50">
+          Already have an account?{" "}
+          <Link href="/admin/login" className="text-violet-700 hover:text-violet-500">
+            Sign in
+          </Link>
+        </p>
       </form>
     </div>
   );

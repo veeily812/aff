@@ -36,11 +36,11 @@ export default function DeleteChannelButton({ channelId }: { channelId: string }
       <button
         onClick={handleDelete}
         disabled={isDeleting}
-        className="text-sm text-red-400 transition-colors hover:text-red-300 disabled:opacity-50"
+        className="text-sm text-red-600 transition-colors hover:text-red-500 disabled:opacity-50"
       >
         {isDeleting ? "Deleting..." : "Delete"}
       </button>
-      {error ? <p className="max-w-[200px] text-right text-xs text-red-400">{error}</p> : null}
+      {error ? <p className="max-w-[200px] text-right text-xs text-red-600">{error}</p> : null}
     </div>
   );
 }

@@ -41,14 +41,14 @@ export default async function AdminProductsPage() {
           {canImport ? (
             <Link
               href="/admin/products/import"
-              className="glass-card rounded-lg px-4 py-2 text-sm font-medium text-white/80 transition-colors hover:text-white"
+              className="glass-card rounded-lg px-4 py-2 text-sm font-medium text-black/80 transition-colors hover:text-black"
             >
               Import from File/Sheet
             </Link>
           ) : null}
           <Link
             href="/admin/products/new"
-            className="gradient-button rounded-lg px-4 py-2 text-sm font-semibold text-white"
+            className="gradient-button rounded-lg px-4 py-2 text-sm font-semibold text-black"
           >
             New Product
           </Link>
@@ -56,7 +56,7 @@ export default async function AdminProductsPage() {
       </div>
 
       {products.length === 0 ? (
-        <p className="text-sm text-white/50">No products yet.</p>
+        <p className="text-sm text-black/50">No products yet.</p>
       ) : (
         <ul className="space-y-3">
           {products.map((product, index) => (
@@ -65,7 +65,7 @@ export default async function AdminProductsPage() {
               className="glass-card glass-card-hover animate-fade-in-up flex items-center gap-4 rounded-xl p-4"
               style={{ animationDelay: `${index * 40}ms` }}
             >
-              <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-white/5">
+              <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-white">
                 <Image
                   src={product.imageUrl}
                   alt={product.name}
@@ -75,13 +75,13 @@ export default async function AdminProductsPage() {
                 />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="truncate font-medium text-white">{product.name}</p>
-                <p className="truncate text-sm text-white/50">{product.description}</p>
+                <p className="truncate font-medium text-black">{product.name}</p>
+                <p className="truncate text-sm text-black/50">{product.description}</p>
               </div>
               <div className="flex shrink-0 items-center gap-3">
                 <Link
                   href={`/admin/products/${product.id}/edit`}
-                  className="text-sm text-white/60 transition-colors hover:text-white"
+                  className="text-sm text-black/60 transition-colors hover:text-black"
                 >
                   Edit
                 </Link>
