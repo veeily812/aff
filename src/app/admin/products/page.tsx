@@ -25,16 +25,40 @@ export default async function AdminProductsPage() {
   const organizationScope = getOrganizationScope(currentUser);
   const channelScope = getChannelScope(currentUser);
 
-  const products = await prisma.product.findMany({
-    where: {
-      organizationId: organizationScope,
-      ...(channelScope ? { channelId: channelScope } : {}),
-    },
-    orderBy: { createdAt: "desc" },
-  });
+  const [products, organization] = await Promise.all([
+    prisma.product.findMany({
+      where: {
+        organizationId: organizationScope,
+        ...(channelScope ? { channelId: channelScope } : {}),
+      },
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.organization.findUnique({
+      where: { id: organizationScope },
+      select: { slug: true },
+    }),
+  ]);
 
   return (
     <div className="space-y-6">
+      {organization ? (
+        <div className="panel-lime animate-fade-in-up flex flex-wrap items-center justify-between gap-3 rounded-2xl p-4">
+          <p className="text-sm font-bold text-black">
+            Your store is live at{" "}
+            <span className="underline underline-offset-4">/store/{organization.slug}</span>
+            {products.length === 0 ? " — add your first product to fill it up!" : ""}
+          </p>
+          <a
+            href={`/store/${organization.slug}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="glass-card rounded-lg bg-white px-4 py-2 text-sm font-semibold text-black"
+          >
+            Visit my store ↗
+          </a>
+        </div>
+      ) : null}
+
       <div className="flex items-center justify-between">
         <h1 className="gradient-text text-2xl font-bold">Products</h1>
         <div className="flex items-center gap-3">
